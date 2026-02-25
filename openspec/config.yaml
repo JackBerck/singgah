@@ -1,0 +1,89 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+context: |
+    ## Project: Singgah
+    Platform to promote Indonesian tourism villages (Desa Wisata) and local creative economies (UMKM).
+
+    ## Tech Stack
+    - Backend: Laravel 12, PHP 8.2+, PostgreSQL
+    - Frontend: React 19, TypeScript, Inertia.js 2.x, Tailwind CSS 4, Shadcn UI, Radix UI
+    - Build: Vite 7, Laravel Wayfinder
+    - Testing: Pest (PHP), PHPUnit
+    - Auth: Laravel Fortify (with 2FA support)
+
+    ## Architecture Patterns (Laravel)
+    - **Skinny Controllers**: Controllers only handle HTTP routing, no business logic
+    - **Action Pattern**: Business logic in dedicated Action classes (e.g., CreateVillageAction)
+    - **DTOs**: Use Data Transfer Objects for type safety
+    - **Form Requests**: Custom Form Request classes for validation (NOT $request->validate())
+    - **Query Management**: Use Eloquent Scopes or Custom Query Builders
+    - **Eager Loading**: Prevent N+1 queries with explicit with() calls
+    - **Validation Language**: All validation messages in Indonesian
+
+    ## Coding Standards
+    - PHP: Laravel Pint with Laravel preset (PSR-12)
+    - TypeScript/React:
+      - ESLint with recommended configs
+      - Consistent type imports (import type { ... })
+      - Import ordering: builtin → external → internal → parent → sibling → index (alphabetized)
+      - React Hooks rules enforced
+      - No prop-types (use TypeScript)
+    - Prettier with Tailwind plugin for formatting
+
+    ## Frontend Architecture & Design Guidelines
+    - **Standardized Layout Structure**: All pages must follow uniform layout pattern with consistent margins/padding
+      - Layout boilerplate:
+        ```tsx
+        <Layout>
+          <section className="section-padding-x">
+            <div className="container max-w-7xl">
+              {/* Content */}
+            </div>
+          </section>
+        </Layout>
+        ```
+    - **Typography**: Use standardized utility classes from app.css, no hardcoded font-size values
+    - **Color Palette**:
+      - Theme: Bright, fresh, inviting (Green for nature/village, Blue for sky/water/trust)
+      - All colors must be CSS variables in app.css (--primary-green, --secondary-blue, etc.)
+      - Never hardcode HEX/RGB values in components
+    - **UI/UX Consistency**: Strict design system for buttons, inputs, cards, spacing, hover effects
+    - **Accessibility**: Clean, simple, intuitive design for all demographics ("ramah di semua kalangan masyarakat")
+      - High contrast text, clear typography, straightforward navigation
+      - Prioritize simplicity over complex animations
+
+    ## Domain Knowledge
+    - User Roles: Visitor (Pengunjung), Village Manager (Pengelola Desa), Super Admin
+    - Key Entities: Villages, Attractions (Wisata), Culinary/UMKM, Accommodations, Events, Reviews
+    - Features: Village profiles, media galleries, ratings/comments, AI Travel Assistant
+    - Polymorphic relationships: Reviews and Media tables
+    - Status workflow: Village status (pending → verified/rejected)
+
+    ## File Structure Conventions
+    - Actions in app/Actions/
+    - Controllers in app/Http/Controllers/
+    - Form Requests in app/Http/Requests/
+    - Models in app/Models/
+    - React pages in resources/js/pages/
+    - React components in resources/js/components/
+    - Tests in tests/Feature/ and tests/Unit/
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+rules:
+    proposal:
+        - Consider impact on both Village Manager and Visitor user experiences
+        - Address Indonesian language requirements for user-facing content
+        - Consider database schema impact and relationships
+    plan:
+        - Separate backend (Laravel) and frontend (React/Inertia) concerns clearly
+        - Include validation rules and error messages in Indonesian
+        - Consider eager loading requirements to prevent N+1 queries
+    tasks:
+        - Break tasks into chunks of max 2-3 hours
+        - Backend tasks should include: Action class, Form Request, Controller method, Routes
+        - Frontend tasks should include: TypeScript types, React components, Inertia page
+        - Include test coverage requirements (Pest for backend)
