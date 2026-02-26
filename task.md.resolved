@@ -1,0 +1,30 @@
+# Task: Homepage & Core Components (Navbar, Footer, Beranda)
+
+## Phase 1: Planning & Spec Update
+- [x] Explore project structure (layouts, CSS, pages, components)
+- [/] Update APP_SPEC.md to include homepage feature spec
+- [/] Write `implementation_plan.md` for review
+
+## Phase 2: Foundation — CSS & Design Tokens
+- [ ] Update [app.css](file:///d:/Code/singgah/resources/css/app.css) — tambah CSS variables untuk warna singgah (green/blue palette), font, dan utility classes baru
+
+## Phase 3: Shared Components
+- [ ] Buat `resources/js/components/public/Navbar.tsx` (navigasi publik, responsive, mobile menu)
+- [ ] Buat `resources/js/components/public/Footer.tsx` (footer lengkap dengan links, sosmed, dan info)
+- [ ] Buat `resources/js/layouts/PublicLayout.tsx` (layout wrapper menggunakan Navbar + Footer)
+
+## Phase 4: Homepage Sections (resources/js/pages/home.tsx)
+- [ ] **Hero Section** — headline, sub-headline, CTA buttons, ilustrasi/gambar background
+- [ ] **Kategori Desa** — grid kategori desa berdasarkan jenis (alam, budaya, kuliner, agrowisata, dll)
+- [ ] **Desa Pilihan** — 8 kartu desa populer/viral dengan gambar, nama, lokasi, rating
+- [ ] **Jelajahi Berdasarkan Wilayah** — card kota/provinsi besar Indonesia (minimal 8 kota)
+- [ ] **Desa Terbaru** — 8 kartu desa yang baru ditambahkan
+
+## Phase 5: Routes & Controller
+- [ ] Tambah route publik `/` di [routes/web.php](file:///d:/Code/singgah/routes/web.php) yang mengarah ke `HomeController`
+- [ ] Buat `app/Http/Controllers/HomeController.php` dengan method `index`
+
+## Phase 6: Verification
+- [ ] Jalankan dev server dan buka browser untuk verifikasi visual
+- [ ] Cek responsivitas di mobile, tablet, dan desktop
+- [ ] Buat `walkthrough.md`

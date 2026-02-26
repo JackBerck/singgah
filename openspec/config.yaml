@@ -54,6 +54,7 @@ context: |
     - **Accessibility**: Clean, simple, intuitive design for all demographics ("ramah di semua kalangan masyarakat")
       - High contrast text, clear typography, straightforward navigation
       - Prioritize simplicity over complex animations
+      - Make all components, subcomponents, pages, or anything else as responsive as possible for all devices.
 
     ## Domain Knowledge
     - User Roles: Visitor (Pengunjung), Village Manager (Pengelola Desa), Super Admin

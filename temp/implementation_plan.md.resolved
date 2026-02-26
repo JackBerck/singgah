@@ -1,0 +1,156 @@
+# Implementasi Halaman Beranda & Komponen Navbar/Footer — Singgah
+
+## Latar Belakang
+
+Halaman publik Singgah saat ini masih menggunakan halaman [welcome.tsx](file:///d:/Code/singgah/resources/js/pages/welcome.tsx) bawaan Laravel. Perlu dibangun halaman **Beranda** yang representatif dengan desain yang unik, sesuai identitas brand Singgah (jelajahi keindahan desa).
+
+Dua komponen penting yang harus dibuat terlebih dahulu adalah **Navbar publik** dan **Footer**, yang kemudian akan digunakan di semua halaman publik melalui `PublicLayout`.
+
+---
+
+## Perubahan yang Diusulkan
+
+### 1. Design System & CSS
+
+#### [MODIFY] [app.css](file:///d:/Code/singgah/resources/css/app.css)
+- Tambah CSS variables untuk warna brand Singgah:
+  - `--singgah-green-*` (primary: hijau desa/alam) 
+  - `--singgah-teal-*` (secondary: biru-hijau air/langit)
+  - `--singgah-earth-*` (accent: cokelat/krem tanah)
+  - `--singgah-sky-*` (langit biru segar)
+- Tambah utility classes baru: `.hero-gradient`, `.section-title`, `.village-card`, dll.
+- Mapping CSS vars ke `@theme` Tailwind untuk penggunaan langsung via class `bg-singgah-green` dll.
+
+---
+
+### 2. Komponen Publik (Shared)
+
+#### [NEW] [Navbar.tsx](file:///d:/Code/singgah/resources/js/components/public/Navbar.tsx)
+Navigasi publik yang akan digunakan di seluruh halaman publik.
+- **Desktop**: Logo "Singgah" di kiri, links navigasi di tengah (Beranda, Jelajahi, Tentang), tombol "Masuk" & "Daftar" di kanan.
+- **Mobile**: Hamburger menu dengan slide-down drawer.
+- **Scroll behavior**: Background transparan saat di atas hero → solid saat di-scroll.
+- **Active state**: Underline animasi pada link yang aktif.
+
+#### [NEW] [Footer.tsx](file:///d:/Code/singgah/resources/js/components/public/Footer.tsx)
+Footer kaya informasi dengan 4 kolom:
+1. Brand (Logo + tagline + deskripsi singkat)
+2. Navigasi (Beranda, Jelajahi Desa, Tentang Kami, Hubungi Kami)
+3. Kategori Desa (Wisata Alam, Budaya, Kuliner, Agrowisata)
+4. Kontak & Sosial Media (ikon Instagram, Twitter/X, YouTube)
+- Copyright di bagian bawah.
+
+#### [NEW] [PublicLayout.tsx](file:///d:/Code/singgah/resources/js/layouts/PublicLayout.tsx)
+Layout wrapper untuk semua halaman publik:
+```tsx
+<>
+  <Navbar />
+  <main>{children}</main>
+  <Footer />
+</>
+```
+
+---
+
+### 3. Halaman Beranda
+
+#### [NEW] [home.tsx](file:///d:/Code/singgah/resources/js/pages/home.tsx)
+Halaman utama publik dengan 5 section:
+
+**Section 1 — Hero**
+- Background: gradient hijau-teal dengan overlay batik/pattern SVG halus (elemen unik).
+- Headline besar: *"Temukan Keindahan Desa Wisata Indonesia"*
+- Sub-headline: *"Dari pantai Jawa hingga ladang Bali, ribuan desa menanti untuk dijelajahi."*
+- 2 CTA Buttons: "Jelajahi Sekarang" (primary) + "Tentang Singgah" (outline)
+- Search bar floating: input pencarian desa dengan ikon search.
+- Stats strip kecil: `1200+ Desa · 34 Provinsi · 50.000+ Pengunjung`.
+
+**Section 2 — Kategori Desa**
+- Judul: *"Temukan Desa Berdasarkan Kategori"*
+- 6 kategori dalam grid horizontal scroll-able di mobile, grid di desktop:
+  - 🌿 Wisata Alam, 🏮 Budaya & Tradisi, 🍜 Kuliner Lokal, 🌾 Agrowisata, 🏄 Pesisir & Bahari, 🎨 Desa Kreatif
+- Setiap kategori: ikon ilustratif + label + count desa (dummy).
+
+**Section 3 — Desa Pilihan** *(8 cards)*
+- Judul: *"Desa Pilihan Minggu Ini"*
+- Sub: *"Desa paling banyak dikunjungi dan dibicarakan."*
+- 8 `VillageCard` dengan: foto, nama desa, lokasi (kota/provinsi), rating bintang, badge kategori.
+- Horizontal scroll di mobile, grid 4-kolom di desktop.
+- CTA bawah: "Lihat Semua Desa →" (link ke /explore).
+
+**Section 4 — Jelajahi Berdasarkan Wilayah**
+- Judul: *"Jelajahi Desa di Seluruh Indonesia"*
+- Grid kartu kota/provinsi besar (8 kota): Bali, Yogyakarta, NTB, Jawa Barat, Sumatera Utara, Sulawesi Selatan, Nusa Tenggara Timur, Kalimantan Timur.
+- Setiap kartu: foto background, nama kota, count desa (dummy).
+- Desain card dengan overlay gradient di atas foto.
+
+**Section 5 — Desa Terbaru** *(8 cards)*
+- Judul: *"Desa Baru di Platform Kami"*
+- Sub: *"Baru bergabung dan siap Anda jelajahi."*
+- 8 `VillageCard` yang sama dengan section Desa Pilihan.
+- CTA bawah: "Lihat Semua Desa Terbaru →".
+
+---
+
+### 4. Routing & Controller
+
+#### [MODIFY] [web.php](file:///d:/Code/singgah/routes/web.php)
+- Ubah route `/` untuk merender halaman `home` (bukan `welcome`).
+- Data dummy: props `featuredVillages`, `newVillages`, `categories`, `regions` akan di-hardcode sementara di controller (belum ada data nyata).
+
+#### [NEW] [HomeController.php](file:///d:/Code/singgah/app/Http/Controllers/HomeController.php)
+- Method `index()` yang me-return Inertia `home` dengan data dummy untuk keperluan display.
+
+---
+
+## Catatan Desain (Unik & Brand-Aware)
+
+> **Identitas Visual Singgah yang Diusulkan:**
+> - **Font display**: Plus Jakarta Sans (sudah ada di stack)
+> - **Warna primer**: Hijau tua elegan `#1B6B3A` (bukan hijau neon/pasaran)
+> - **Warna sekunder**: Teal `#0E9E8A` (langit/air segar)
+> - **Accent**: Krem/tanah `#F5E6C8` (hangat, lokal, earthy)
+> - **Motif unik**: Subtle batik/wayang vector pattern sebagai background accent di Hero
+> - **Cards**: Rounded-2xl dengan shadow halus, hover lift effect (transform translateY)
+
+---
+
+## APP_SPEC — Perubahan yang Diusulkan
+
+Tambah section baru di `APP_SPEC .md`:
+
+```markdown
+## 7. HALAMAN BERANDA (PUBLIC HOMEPAGE)
+
+### Sections:
+1. **Hero** — Headline, sub-headline, search bar, CTA, stats strip
+2. **Kategori Desa** — 6 kategori (alam, budaya, kuliner, agrowisata, pesisir, kreatif)
+3. **Desa Pilihan** — 8 card desa populer/viral (link ke /explore)
+4. **Jelajahi per Wilayah** — 8 kota/provinsi besar Indonesia
+5. **Desa Terbaru** — 8 card desa yang baru ditambahkan (link ke /explore)
+
+### Komponen Bersama (Public):
+- **Navbar** — Publik, transparan-to-solid on scroll, mobile hamburger
+- **Footer** — 4 kolom, sosmed links, copyright
+- **PublicLayout** — Wrapper Navbar + Footer untuk semua halaman publik
+- **VillageCard** — Reusable card component untuk desa
+- **RegionCard** — Card dengan background foto + overlay untuk wilayah
+```
+
+---
+
+## Rencana Verifikasi
+
+### Visual Check (Browser)
+1. Jalankan dev server: `cd d:\Code\singgah && npm run dev`
+2. Buka browser ke `http://localhost:8000`
+3. Verifikasi tampilan setiap section pada:
+   - Desktop (1280px+)
+   - Tablet (768px)
+   - Mobile (375px — gunakan DevTools)
+4. Cek Navbar scroll behavior (transparan → solid).
+5. Cek hamburger menu di mobile.
+6. Hover effects pada cards.
+
+### No Automated Tests Required
+Fitur ini adalah UI-only tanpa logika backend yang perlu ditest. Data masih dummy. Backend test akan ditambah setelah database schema dan controller selesai di iterasi berikutnya.

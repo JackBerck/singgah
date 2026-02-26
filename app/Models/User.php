@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -22,6 +23,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
+        'phone',
+        'address',
+        'role',
     ];
 
     /**
@@ -48,5 +53,36 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    // ─── Role Helpers ────────────────────────────────────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isManager(): bool
+    {
+        return $this->role === 'manager';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    // ─── Relationships ────────────────────────────────────────────────────────────
+
+    /** Villages managed by this user (manager role) */
+    public function villages(): HasMany
+    {
+        return $this->hasMany(Village::class, 'manager_id');
+    }
+
+    /** Reviews written by this user */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 }
