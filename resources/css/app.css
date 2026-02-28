@@ -8,7 +8,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-jakarta: "Plus Jakarta Sans", sans-serif;
+    --font-jakarta: 'Plus Jakarta Sans', sans-serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -56,6 +56,33 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* ── Singgah Brand Colors ── */
+    --color-singgah-green-50: var(--singgah-green-50);
+    --color-singgah-green-100: var(--singgah-green-100);
+    --color-singgah-green-200: var(--singgah-green-200);
+    --color-singgah-green-400: var(--singgah-green-400);
+    --color-singgah-green-600: var(--singgah-green-600);
+    --color-singgah-green-700: var(--singgah-green-700);
+    --color-singgah-green-800: var(--singgah-green-800);
+    --color-singgah-green-900: var(--singgah-green-900);
+
+    --color-singgah-teal-50: var(--singgah-teal-50);
+    --color-singgah-teal-100: var(--singgah-teal-100);
+    --color-singgah-teal-400: var(--singgah-teal-400);
+    --color-singgah-teal-500: var(--singgah-teal-500);
+    --color-singgah-teal-600: var(--singgah-teal-600);
+    --color-singgah-teal-700: var(--singgah-teal-700);
+
+    --color-singgah-earth-50: var(--singgah-earth-50);
+    --color-singgah-earth-100: var(--singgah-earth-100);
+    --color-singgah-earth-200: var(--singgah-earth-200);
+    --color-singgah-earth-400: var(--singgah-earth-400);
+    --color-singgah-earth-600: var(--singgah-earth-600);
+
+    --color-singgah-sky-400: var(--singgah-sky-400);
+    --color-singgah-sky-500: var(--singgah-sky-500);
+    --color-singgah-sky-600: var(--singgah-sky-600);
 }
 
 :root {
@@ -92,6 +119,36 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    /* ── Singgah Green (primary — alam/desa) ── */
+    --singgah-green-50: #f0faf4;
+    --singgah-green-100: #d9f2e4;
+    --singgah-green-200: #b3e5c8;
+    --singgah-green-400: #4caf79;
+    --singgah-green-600: #1b7a45;
+    --singgah-green-700: #155e35;
+    --singgah-green-800: #0f4426;
+    --singgah-green-900: #092b18;
+
+    /* ── Singgah Teal (secondary — air/langit) ── */
+    --singgah-teal-50: #edfafa;
+    --singgah-teal-100: #d0f4f0;
+    --singgah-teal-400: #2cc8b4;
+    --singgah-teal-500: #0e9e8a;
+    --singgah-teal-600: #0a7d6e;
+    --singgah-teal-700: #075e52;
+
+    /* ── Singgah Earth (accent — tanah/lokal) ── */
+    --singgah-earth-50: #fdf8f0;
+    --singgah-earth-100: #f8edd8;
+    --singgah-earth-200: #f0d9b0;
+    --singgah-earth-400: #c9954a;
+    --singgah-earth-600: #9a6a28;
+
+    /* ── Singgah Sky (blue sky) ── */
+    --singgah-sky-400: #38bdf8;
+    --singgah-sky-500: #0ea5e9;
+    --singgah-sky-600: #0284c7;
 }
 
 .dark {
@@ -184,6 +241,234 @@
 
     .normal-footer-font-size {
         @apply text-sm;
+    }
+
+    /* ── Singgah Public Components ── */
+    .hero-gradient {
+        background: linear-gradient(
+            135deg,
+            var(--singgah-green-900) 0%,
+            var(--singgah-green-700) 40%,
+            var(--singgah-teal-700) 100%
+        );
+    }
+
+    .section-header {
+        @apply mb-8 md:mb-12;
+    }
+
+    .section-label {
+        @apply mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase;
+        background: var(--singgah-green-100);
+        color: var(--singgah-green-700);
+    }
+
+    .section-title {
+        @apply text-xl leading-tight font-bold md:text-2xl lg:text-3xl xl:text-4xl;
+        color: #1a2e1e;
+    }
+    .section-subtitle {
+        @apply mt-2 text-sm sm:text-base;
+        color: #5a7060;
+    }
+
+    .village-card {
+        @apply overflow-hidden rounded-2xl bg-white transition-all duration-300;
+        box-shadow: 0 2px 12px rgba(27, 122, 69, 0.08);
+    }
+
+    .village-card:hover {
+        @apply -translate-y-1.5;
+        box-shadow: 0 8px 28px rgba(27, 122, 69, 0.18);
+    }
+
+    .region-card {
+        @apply relative cursor-pointer overflow-hidden rounded-2xl transition-all duration-300;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .region-card:hover {
+        @apply -translate-y-1;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .category-card {
+        @apply flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl p-5 transition-all duration-200;
+        background: var(--singgah-green-50);
+        border: 1.5px solid var(--singgah-green-100);
+    }
+
+    .category-card:hover {
+        background: var(--singgah-green-600);
+        border-color: var(--singgah-green-600);
+        @apply -translate-y-0.5;
+    }
+
+    .category-card:hover .category-icon,
+    .category-card:hover .category-label {
+        @apply text-white;
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition-all duration-200;
+        background: var(--singgah-green-600);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background: var(--singgah-green-700);
+        @apply -translate-y-0.5;
+        box-shadow: 0 6px 20px rgba(27, 122, 69, 0.35);
+    }
+
+    .btn-outline-white {
+        @apply inline-flex items-center gap-2 rounded-full border-2 border-white px-6 py-3 font-semibold text-white transition-all duration-200;
+    }
+
+    .btn-outline-white:hover {
+        @apply bg-white;
+        color: var(--singgah-green-700);
+    }
+
+    .rating-star {
+        color: var(--singgah-earth-400);
+    }
+
+    /* ── Singgah Auth Layout ── */
+    .auth-layout-root {
+        @apply flex min-h-svh;
+    }
+
+    .auth-panel-left {
+        background: linear-gradient(
+            150deg,
+            var(--singgah-green-900) 0%,
+            var(--singgah-green-700) 45%,
+            var(--singgah-teal-700) 100%
+        );
+        @apply relative hidden overflow-hidden md:flex md:w-1/2 md:flex-col md:items-center md:justify-center;
+    }
+
+    .auth-panel-right {
+        @apply flex w-full flex-col md:w-1/2;
+    }
+
+    .auth-input-focus {
+        --tw-ring-color: var(--singgah-green-600);
+    }
+
+    /* ── Static Public Pages ── */
+
+    /* Legal document layout */
+    .legal-section {
+        @apply border-b py-8 last:border-b-0;
+        border-color: var(--singgah-green-100);
+    }
+
+    .legal-h2 {
+        @apply mb-4 flex items-center gap-3 pb-2 text-xl font-bold md:text-2xl;
+        color: #1a2e1e;
+        border-bottom: 2px solid var(--singgah-green-200);
+    }
+
+    .legal-h2::before {
+        content: '';
+        display: inline-block;
+        width: 4px;
+        height: 1.4em;
+        border-radius: 4px;
+        background: var(--singgah-green-600);
+        flex-shrink: 0;
+    }
+
+    .legal-h3 {
+        @apply mt-5 mb-2 text-base font-semibold md:text-lg;
+        color: #1a2e1e;
+    }
+
+    .legal-p {
+        @apply mb-3 text-sm leading-relaxed sm:text-base;
+        color: #4a5c4f;
+    }
+
+    .legal-ul {
+        @apply mb-3 space-y-1.5 pl-5;
+        color: #4a5c4f;
+    }
+
+    .legal-ul li {
+        @apply list-disc text-sm leading-relaxed sm:text-base;
+    }
+
+    /* Role badges */
+    .role-badge {
+        @apply mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+    }
+
+    .role-badge-visitor {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+    .role-badge-manager {
+        background: var(--singgah-green-50);
+        color: var(--singgah-green-700);
+        border: 1px solid var(--singgah-green-200);
+    }
+
+    /* Sticky TOC */
+    .toc-link {
+        @apply block rounded-lg px-3 py-1.5 text-sm transition-all duration-150;
+        color: #5a7060;
+    }
+
+    .toc-link:hover {
+        background: var(--singgah-green-50);
+        color: var(--singgah-green-700);
+    }
+
+    .toc-link.active {
+        background: var(--singgah-green-100);
+        color: var(--singgah-green-700);
+        @apply font-semibold;
+    }
+
+    /* FAQ accordion */
+    .faq-item {
+        @apply overflow-hidden rounded-xl transition-all duration-200;
+        border: 1.5px solid var(--singgah-green-100);
+    }
+
+    .faq-item:hover {
+        border-color: var(--singgah-green-300);
+    }
+
+    /* How it works step */
+    .step-card {
+        @apply relative flex flex-col items-center rounded-2xl p-6 text-center;
+        background: white;
+        border: 1.5px solid var(--singgah-green-100);
+    }
+
+    .step-number-bg {
+        @apply pointer-events-none absolute top-3 right-4 text-6xl font-extrabold select-none;
+        color: var(--singgah-green-100);
+        line-height: 1;
+    }
+
+    /* Value / feature card */
+    .value-card {
+        @apply flex flex-col gap-4 rounded-2xl p-6 transition-all duration-200;
+        background: white;
+        border: 1.5px solid var(--singgah-green-100);
+        box-shadow: 0 2px 12px rgba(27, 122, 69, 0.06);
+    }
+
+    .value-card:hover {
+        border-color: var(--singgah-green-300);
+        box-shadow: 0 6px 24px rgba(27, 122, 69, 0.12);
+        @apply -translate-y-0.5;
     }
 }
 

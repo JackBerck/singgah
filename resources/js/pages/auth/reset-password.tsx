@@ -15,10 +15,10 @@ type Props = {
 export default function ResetPassword({ token, email }: Props) {
     return (
         <AuthLayout
-            title="Reset password"
-            description="Please enter your new password below"
+            title="Buat Kata Sandi Baru"
+            description="Masukkan kata sandi baru Anda di bawah ini"
         >
-            <Head title="Reset password" />
+            <Head title="Reset Kata Sandi" />
 
             <Form
                 {...update.form()}
@@ -26,64 +26,77 @@ export default function ResetPassword({ token, email }: Props) {
                 resetOnSuccess={['password', 'password_confirmation']}
             >
                 {({ processing, errors }) => (
-                    <div className="grid gap-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                    <div className="grid gap-5">
+                        {/* Email (read-only) */}
+                        <div className="grid gap-1.5">
+                            <Label
+                                htmlFor="email"
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                Alamat Email
+                            </Label>
                             <Input
                                 id="email"
                                 type="email"
                                 name="email"
                                 autoComplete="email"
                                 value={email}
-                                className="mt-1 block w-full"
                                 readOnly
+                                className="bg-gray-50 text-gray-500 focus-visible:ring-[var(--singgah-green-600)]"
                             />
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
+                            <InputError message={errors.email} />
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                        {/* Kata sandi baru */}
+                        <div className="grid gap-1.5">
+                            <Label
+                                htmlFor="password"
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                Kata Sandi Baru
+                            </Label>
                             <Input
                                 id="password"
                                 type="password"
                                 name="password"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
                                 autoFocus
-                                placeholder="Password"
+                                placeholder="Minimal 8 karakter"
+                                className="focus-visible:ring-[var(--singgah-green-600)]"
                             />
                             <InputError message={errors.password} />
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
+                        {/* Konfirmasi */}
+                        <div className="grid gap-1.5">
+                            <Label
+                                htmlFor="password_confirmation"
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                Konfirmasi Kata Sandi
                             </Label>
                             <Input
                                 id="password_confirmation"
                                 type="password"
                                 name="password_confirmation"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                placeholder="Confirm password"
+                                placeholder="Ulangi kata sandi baru"
+                                className="focus-visible:ring-[var(--singgah-green-600)]"
                             />
                             <InputError
                                 message={errors.password_confirmation}
-                                className="mt-2"
                             />
                         </div>
 
                         <Button
                             type="submit"
-                            className="mt-4 w-full"
+                            className="mt-1 w-full rounded-full font-semibold text-white"
+                            style={{ background: 'var(--singgah-green-600)' }}
                             disabled={processing}
                             data-test="reset-password-button"
                         >
                             {processing && <Spinner />}
-                            Reset password
+                            Simpan Kata Sandi
                         </Button>
                     </div>
                 )}

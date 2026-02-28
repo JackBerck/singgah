@@ -10,39 +10,47 @@ import { store } from '@/routes/password/confirm';
 export default function ConfirmPassword() {
     return (
         <AuthLayout
-            title="Confirm your password"
-            description="This is a secure area of the application. Please confirm your password before continuing."
+            title="Konfirmasi Kata Sandi"
+            description="Ini adalah area aman. Harap konfirmasi kata sandi Anda sebelum melanjutkan."
         >
-            <Head title="Confirm password" />
+            <Head title="Konfirmasi Kata Sandi" />
 
-            <Form {...store.form()} resetOnSuccess={['password']}>
+            <Form
+                {...store.form()}
+                resetOnSuccess={['password']}
+                className="flex flex-col gap-5"
+            >
                 {({ processing, errors }) => (
-                    <div className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                    <>
+                        <div className="grid gap-1.5">
+                            <Label
+                                htmlFor="password"
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                Kata Sandi
+                            </Label>
                             <Input
                                 id="password"
                                 type="password"
                                 name="password"
-                                placeholder="Password"
+                                placeholder="Kata sandi Anda"
                                 autoComplete="current-password"
                                 autoFocus
+                                className="focus-visible:ring-[var(--singgah-green-600)]"
                             />
-
                             <InputError message={errors.password} />
                         </div>
 
-                        <div className="flex items-center">
-                            <Button
-                                className="w-full"
-                                disabled={processing}
-                                data-test="confirm-password-button"
-                            >
-                                {processing && <Spinner />}
-                                Confirm password
-                            </Button>
-                        </div>
-                    </div>
+                        <Button
+                            className="w-full rounded-full font-semibold text-white"
+                            style={{ background: 'var(--singgah-green-600)' }}
+                            disabled={processing}
+                            data-test="confirm-password-button"
+                        >
+                            {processing && <Spinner />}
+                            Konfirmasi
+                        </Button>
+                    </>
                 )}
             </Form>
         </AuthLayout>

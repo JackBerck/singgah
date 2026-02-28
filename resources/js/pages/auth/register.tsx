@@ -12,21 +12,27 @@ import { store } from '@/routes/register';
 export default function Register() {
     return (
         <AuthLayout
-            title="Create an account"
-            description="Enter your details below to create your account"
+            title="Buat Akun Baru"
+            description="Daftarkan diri Anda untuk mulai menjelajahi desa wisata Indonesia"
         >
-            <Head title="Register" />
+            <Head title="Daftar" />
             <Form
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                        <div className="grid gap-5">
+                            {/* Nama */}
+                            <div className="grid gap-1.5">
+                                <Label
+                                    htmlFor="name"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Nama Lengkap
+                                </Label>
                                 <Input
                                     id="name"
                                     type="text"
@@ -35,16 +41,20 @@ export default function Register() {
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
-                                    placeholder="Full name"
+                                    placeholder="Nama lengkap Anda"
+                                    className="focus-visible:ring-[var(--singgah-green-600)]"
                                 />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.name} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                            {/* Email */}
+                            <div className="grid gap-1.5">
+                                <Label
+                                    htmlFor="email"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Alamat Email
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -52,13 +62,20 @@ export default function Register() {
                                     tabIndex={2}
                                     autoComplete="email"
                                     name="email"
-                                    placeholder="email@example.com"
+                                    placeholder="contoh@email.com"
+                                    className="focus-visible:ring-[var(--singgah-green-600)]"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
+                            {/* Password */}
+                            <div className="grid gap-1.5">
+                                <Label
+                                    htmlFor="password"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Kata Sandi
+                                </Label>
                                 <Input
                                     id="password"
                                     type="password"
@@ -66,14 +83,19 @@ export default function Register() {
                                     tabIndex={3}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder="Password"
+                                    placeholder="Minimal 8 karakter"
+                                    className="focus-visible:ring-[var(--singgah-green-600)]"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
+                            {/* Konfirmasi password */}
+                            <div className="grid gap-1.5">
+                                <Label
+                                    htmlFor="password_confirmation"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Konfirmasi Kata Sandi
                                 </Label>
                                 <Input
                                     id="password_confirmation"
@@ -82,28 +104,38 @@ export default function Register() {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="Confirm password"
+                                    placeholder="Ulangi kata sandi Anda"
+                                    className="focus-visible:ring-[var(--singgah-green-600)]"
                                 />
                                 <InputError
                                     message={errors.password_confirmation}
                                 />
                             </div>
 
+                            {/* Submit */}
                             <Button
                                 type="submit"
-                                className="mt-2 w-full"
+                                className="mt-1 w-full rounded-full font-semibold text-white"
+                                style={{
+                                    background: 'var(--singgah-green-600)',
+                                }}
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
-                                Create account
+                                Daftar Sekarang
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
+                        <div className="text-center text-sm text-gray-500">
+                            Sudah punya akun?{' '}
+                            <TextLink
+                                href={login()}
+                                tabIndex={6}
+                                className="font-semibold transition-colors"
+                                style={{ color: 'var(--singgah-green-600)' }}
+                            >
+                                Masuk
                             </TextLink>
                         </div>
                     </>

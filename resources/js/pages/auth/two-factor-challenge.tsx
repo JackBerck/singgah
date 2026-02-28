@@ -24,18 +24,18 @@ export default function TwoFactorChallenge() {
     }>(() => {
         if (showRecoveryInput) {
             return {
-                title: 'Recovery Code',
+                title: 'Kode Pemulihan',
                 description:
-                    'Please confirm access to your account by entering one of your emergency recovery codes.',
-                toggleText: 'login using an authentication code',
+                    'Masukkan salah satu kode pemulihan darurat Anda untuk mengakses akun.',
+                toggleText: 'gunakan kode autentikasi',
             };
         }
 
         return {
-            title: 'Authentication Code',
+            title: 'Kode Autentikasi',
             description:
-                'Enter the authentication code provided by your authenticator application.',
-            toggleText: 'login using a recovery code',
+                'Masukkan kode dari aplikasi autentikator Anda untuk melanjutkan.',
+            toggleText: 'gunakan kode pemulihan',
         };
     }, [showRecoveryInput]);
 
@@ -50,9 +50,9 @@ export default function TwoFactorChallenge() {
             title={authConfigContent.title}
             description={authConfigContent.description}
         >
-            <Head title="Two-Factor Authentication" />
+            <Head title="Verifikasi Dua Langkah" />
 
-            <div className="space-y-6">
+            <div className="space-y-5">
                 <Form
                     {...store.form()}
                     className="space-y-4"
@@ -63,19 +63,25 @@ export default function TwoFactorChallenge() {
                         <>
                             {showRecoveryInput ? (
                                 <>
-                                    <Input
-                                        name="recovery_code"
-                                        type="text"
-                                        placeholder="Enter recovery code"
-                                        autoFocus={showRecoveryInput}
-                                        required
-                                    />
-                                    <InputError
-                                        message={errors.recovery_code}
-                                    />
+                                    <div className="grid gap-1.5">
+                                        <Input
+                                            name="recovery_code"
+                                            type="text"
+                                            placeholder="Masukkan kode pemulihan"
+                                            autoFocus={showRecoveryInput}
+                                            required
+                                            className="focus-visible:ring-[var(--singgah-green-600)]"
+                                        />
+                                        <InputError
+                                            message={errors.recovery_code}
+                                        />
+                                    </div>
                                 </>
                             ) : (
                                 <div className="flex flex-col items-center justify-center space-y-3 text-center">
+                                    <p className="text-sm text-gray-500">
+                                        Kode dari aplikasi autentikator Anda
+                                    </p>
                                     <div className="flex w-full items-center justify-center">
                                         <InputOTP
                                             name="code"
@@ -104,17 +110,23 @@ export default function TwoFactorChallenge() {
 
                             <Button
                                 type="submit"
-                                className="w-full"
+                                className="w-full rounded-full font-semibold text-white"
+                                style={{
+                                    background: 'var(--singgah-green-600)',
+                                }}
                                 disabled={processing}
                             >
-                                Continue
+                                Lanjutkan
                             </Button>
 
-                            <div className="text-center text-sm text-muted-foreground">
-                                <span>or you can </span>
+                            <div className="text-center text-sm text-gray-500">
+                                <span>atau </span>
                                 <button
                                     type="button"
-                                    className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                    className="cursor-pointer font-medium transition-colors hover:underline"
+                                    style={{
+                                        color: 'var(--singgah-green-600)',
+                                    }}
                                     onClick={() =>
                                         toggleRecoveryMode(clearErrors)
                                     }
