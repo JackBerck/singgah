@@ -476,3 +476,46 @@
 html {
     scroll-behavior: smooth;
 }
+
+/* ─── Global Button Utilities ─────────────────────────────────────────────── */
+@layer utilities {
+    .btn-primary {
+        @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150;
+        background: var(--singgah-green-700);
+        box-shadow: 0 2px 8px rgba(27, 122, 69, 0.25);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: var(--singgah-green-600);
+        box-shadow: 0 4px 16px rgba(27, 122, 69, 0.35);
+        @apply -translate-y-px;
+    }
+
+    .btn-primary:disabled {
+        @apply cursor-not-allowed opacity-60;
+    }
+
+    /* Tiptap prose rendering inside rich editor */
+    .prose h2 {
+        @apply mt-4 mb-2 text-lg font-bold text-gray-900;
+    }
+    .prose h3 {
+        @apply mt-3 mb-1.5 text-base font-semibold text-gray-800;
+    }
+    .prose p {
+        @apply mb-2 text-sm leading-relaxed text-gray-600;
+    }
+    .prose ul {
+        @apply mb-2 list-disc space-y-1 pl-5 text-sm text-gray-600;
+    }
+    .prose ol {
+        @apply mb-2 list-decimal space-y-1 pl-5 text-sm text-gray-600;
+    }
+    .prose blockquote {
+        @apply my-2 border-l-4 pl-4 text-gray-500 italic;
+        border-color: var(--singgah-green-300);
+    }
+    .prose strong {
+        @apply font-semibold text-gray-800;
+    }
+}
