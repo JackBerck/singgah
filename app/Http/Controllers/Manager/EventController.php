@@ -47,20 +47,23 @@ class EventController extends Controller
         $data['village_id'] = $village->id;
         $data['slug']       = Str::slug($data['name']) . '-' . now()->timestamp;
 
-        $mediaIds = $data['media_ids'] ?? [];
-        unset($data['media_ids']);
+        $files = $request->file('files', []);
+        unset($data['files'], $data['existing_media_ids']);
 
         $event = VillageEvent::create($data);
 
-        // Attach media from village to event
-        if (!empty($mediaIds)) {
-            \App\Models\Media::whereIn('id', $mediaIds)
-                ->where('mediable_type', \App\Models\Village::class)
-                ->where('mediable_id', $village->id)
-                ->update([
-                    'mediable_type' => VillageEvent::class,
-                    'mediable_id'   => $event->id,
-                ]);
+        // Handle file uploads
+        foreach ($files as $index => $file) {
+            $dir = 'events/' . $event->id;
+            $path = $file->store($dir, 'public');
+
+            $event->media()->create([
+                'file_path' => $path,
+                'disk'      => 'public',
+                'type'      => str_starts_with($file->getMimeType() ?? '', 'video/') ? 'video' : 'image',
+                'alt_text'  => $file->getClientOriginalName(),
+                'order'     => $index,
+            ]);
         }
 
         return redirect()->route('manager.events.index')
@@ -84,21 +87,31 @@ class EventController extends Controller
         abort_unless($event->village_id === $this->village($request)->id, 403);
 
         $data = $request->validated();
-        $mediaIds = $data['media_ids'] ?? [];
-        unset($data['media_ids']);
+        $existingMediaIds = $data['existing_media_ids'] ?? [];
+        $files = $request->file('files', []);
+        unset($data['existing_media_ids'], $data['files']);
 
         $event->update($data);
 
-        // Attach new media from village to event
-        if (!empty($mediaIds)) {
-            $village = $this->village($request);
-            \App\Models\Media::whereIn('id', $mediaIds)
-                ->where('mediable_type', \App\Models\Village::class)
-                ->where('mediable_id', $village->id)
-                ->update([
-                    'mediable_type' => VillageEvent::class,
-                    'mediable_id'   => $event->id,
-                ]);
+        // Delete media not in existing list
+        $event->media()->whereNotIn('id', $existingMediaIds)->each(function ($media) {
+            \Storage::disk($media->disk ?? 'public')->delete($media->file_path);
+            $media->delete();
+        });
+
+        // Upload new files
+        $maxOrder = $event->media()->max('order') ?? -1;
+        foreach ($files as $index => $file) {
+            $dir = 'events/' . $event->id;
+            $path = $file->store($dir, 'public');
+
+            $event->media()->create([
+                'file_path' => $path,
+                'disk'      => 'public',
+                'type'      => str_starts_with($file->getMimeType() ?? '', 'video/') ? 'video' : 'image',
+                'alt_text'  => $file->getClientOriginalName(),
+                'order'     => $maxOrder + $index + 1,
+            ]);
         }
 
         return redirect()->route('manager.events.index')

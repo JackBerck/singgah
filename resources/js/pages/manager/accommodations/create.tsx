@@ -1,10 +1,11 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { Save } from 'lucide-react';
+import { useState } from 'react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
-import MediaUploader from '@/components/manager/MediaUploader';
+import MediaInput from '@/components/manager/MediaInput';
 
 interface Village {
     id: number;
@@ -51,7 +52,8 @@ function Input(
 }
 
 export default function CreateAccommodation({ village }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
+    const [files, setFiles] = useState<File[]>([]);
+    const { data, setData, processing, errors, setError } = useForm({
         name: '',
         description: '',
         price_min: '',
@@ -59,11 +61,30 @@ export default function CreateAccommodation({ village }: Props) {
         location: '',
         contact_info: '',
         operating_hours: '',
-        media_ids: [] as number[],
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/manager/accommodations');
+        
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price_min', data.price_min);
+        formData.append('price_max', data.price_max);
+        formData.append('location', data.location);
+        formData.append('contact_info', data.contact_info);
+        formData.append('operating_hours', data.operating_hours);
+        
+        files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        router.post('/manager/accommodations', formData, {
+            onError: (errors) => {
+                Object.keys(errors).forEach(key => {
+                    setError(key as keyof typeof data, errors[key]);
+                });
+            },
+        });
     };
 
     return (
@@ -182,17 +203,10 @@ export default function CreateAccommodation({ village }: Props) {
                             </Field>
                         </div>
                         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <MediaUploader
-                                uploadRoute="/manager/village/media"
-                                deleteRoute={(id) =>
-                                    `/manager/village/media/${id}`
-                                }
-                                label="Foto Akomodasi"
-                                maxFiles={10}
-                                maxSizeMB={5}
-                                onMediaChange={(ids) =>
-                                    setData('media_ids', ids)
-                                }
+                            <MediaInput
+                                label="Foto/Video Akomodasi"
+                                maxFiles={15}
+                                onChange={(selectedFiles) => setFiles(selectedFiles)}
                             />
                         </div>
                     </div>

@@ -1,10 +1,11 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { Save } from 'lucide-react';
+import { useState } from 'react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
-import MediaUploader from '@/components/manager/MediaUploader';
+import MediaInput from '@/components/manager/MediaInput';
 
 interface Village {
     id: number;
@@ -68,18 +69,46 @@ function Input(
 }
 
 export default function EditCulinary({ village, culinary }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
+    const [files, setFiles] = useState<File[]>([]);
+    const [existingMediaIds, setExistingMediaIds] = useState<number[]>(
+        culinary.media.map((m) => m.id)
+    );
+    
+    const { data, setData, processing, errors, setError } = useForm({
         name: culinary.name,
         description: culinary.description,
         price_min: culinary.price_min?.toString() ?? '',
         price_max: culinary.price_max?.toString() ?? '',
         location: culinary.location ?? '',
         contact_info: culinary.contact_info ?? '',
-        media_ids: [] as number[],
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/manager/culinaries/${culinary.id}`);
+        
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price_min', data.price_min);
+        formData.append('price_max', data.price_max);
+        formData.append('location', data.location);
+        formData.append('contact_info', data.contact_info);
+        
+        existingMediaIds.forEach((id) => {
+            formData.append('existing_media_ids[]', id.toString());
+        });
+        
+        files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        router.post(`/manager/culinaries/${culinary.id}`, formData, {
+            onError: (errors) => {
+                Object.keys(errors).forEach(key => {
+                    setError(key as keyof typeof data, errors[key]);
+                });
+            },
+        });
     };
 
     return (
@@ -176,15 +205,14 @@ export default function EditCulinary({ village, culinary }: Props) {
                             </div>
                         </div>
                         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <MediaUploader
-                                existing={culinary.media}
-                                uploadRoute="/manager/village/media"
-                                deleteRoute={(id) => `/manager/media/${id}`}
-                                label="Foto Kuliner / UMKM"
-                                maxFiles={5}
-                                onMediaChange={(ids) =>
-                                    setData('media_ids', ids)
-                                }
+                            <MediaInput
+                                label="Foto/Video Kuliner / UMKM"
+                                maxFiles={15}
+                                existingMedia={culinary.media}
+                                onChange={(selectedFiles, selectedExistingIds) => {
+                                    setFiles(selectedFiles);
+                                    setExistingMediaIds(selectedExistingIds);
+                                }}
                             />
                         </div>
                     </div>

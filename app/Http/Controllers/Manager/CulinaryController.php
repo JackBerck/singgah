@@ -43,20 +43,23 @@ class CulinaryController extends Controller
         $data['village_id'] = $village->id;
         $data['slug']       = Str::slug($data['name']) . '-' . now()->timestamp;
 
-        $mediaIds = $data['media_ids'] ?? [];
-        unset($data['media_ids']);
+        $files = $request->file('files', []);
+        unset($data['files'], $data['existing_media_ids']);
 
         $culinary = Culinary::create($data);
 
-        // Attach media from village to culinary
-        if (!empty($mediaIds)) {
-            \App\Models\Media::whereIn('id', $mediaIds)
-                ->where('mediable_type', \App\Models\Village::class)
-                ->where('mediable_id', $village->id)
-                ->update([
-                    'mediable_type' => Culinary::class,
-                    'mediable_id'   => $culinary->id,
-                ]);
+        // Upload files
+        foreach ($files as $index => $file) {
+            $dir = 'culinaries/' . $culinary->id;
+            $path = $file->store($dir, 'public');
+
+            $culinary->media()->create([
+                'file_path' => $path,
+                'disk'      => 'public',
+                'type'      => str_starts_with($file->getMimeType() ?? '', 'video/') ? 'video' : 'image',
+                'alt_text'  => $file->getClientOriginalName(),
+                'order'     => $index,
+            ]);
         }
 
         return redirect()->route('manager.culinaries.index')
@@ -80,21 +83,31 @@ class CulinaryController extends Controller
         abort_unless($culinary->village_id === $this->village($request)->id, 403);
 
         $data = $request->validated();
-        $mediaIds = $data['media_ids'] ?? [];
-        unset($data['media_ids']);
+        $existingMediaIds = $data['existing_media_ids'] ?? [];
+        $files = $request->file('files', []);
+        unset($data['existing_media_ids'], $data['files']);
 
         $culinary->update($data);
 
-        // Attach new media from village to culinary
-        if (!empty($mediaIds)) {
-            $village = $this->village($request);
-            \App\Models\Media::whereIn('id', $mediaIds)
-                ->where('mediable_type', \App\Models\Village::class)
-                ->where('mediable_id', $village->id)
-                ->update([
-                    'mediable_type' => Culinary::class,
-                    'mediable_id'   => $culinary->id,
-                ]);
+        // Delete media not in existing list
+        $culinary->media()->whereNotIn('id', $existingMediaIds)->each(function ($media) {
+            \Storage::disk($media->disk ?? 'public')->delete($media->file_path);
+            $media->delete();
+        });
+
+        // Upload new files
+        $maxOrder = $culinary->media()->max('order') ?? -1;
+        foreach ($files as $index => $file) {
+            $dir = 'culinaries/' . $culinary->id;
+            $path = $file->store($dir, 'public');
+
+            $culinary->media()->create([
+                'file_path' => $path,
+                'disk'      => 'public',
+                'type'      => str_starts_with($file->getMimeType() ?? '', 'video/') ? 'video' : 'image',
+                'alt_text'  => $file->getClientOriginalName(),
+                'order'     => $maxOrder + $index + 1,
+            ]);
         }
 
         return redirect()->route('manager.culinaries.index')

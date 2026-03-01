@@ -1,10 +1,11 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { Save } from 'lucide-react';
+import { useState } from 'react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
-import MediaUploader from '@/components/manager/MediaUploader';
+import MediaInput from '@/components/manager/MediaInput';
 
 interface Village {
     id: number;
@@ -69,7 +70,12 @@ function Input(
 }
 
 export default function EditAttraction({ village, attraction }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
+    const [files, setFiles] = useState<File[]>([]);
+    const [existingMediaIds, setExistingMediaIds] = useState<number[]>(
+        attraction.media.map((m) => m.id)
+    );
+    
+    const { data, setData, processing, errors, setError } = useForm({
         name: attraction.name,
         description: attraction.description,
         price_min: attraction.price_min?.toString() ?? '',
@@ -77,11 +83,35 @@ export default function EditAttraction({ village, attraction }: Props) {
         location: attraction.location ?? '',
         contact_info: attraction.contact_info ?? '',
         operating_hours: attraction.operating_hours ?? '',
-        media_ids: [] as number[],
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/manager/attractions/${attraction.id}`);
+        
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price_min', data.price_min);
+        formData.append('price_max', data.price_max);
+        formData.append('location', data.location);
+        formData.append('contact_info', data.contact_info);
+        formData.append('operating_hours', data.operating_hours);
+        
+        existingMediaIds.forEach((id) => {
+            formData.append('existing_media_ids[]', id.toString());
+        });
+        
+        files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        router.post(`/manager/attractions/${attraction.id}`, formData, {
+            onError: (errors) => {
+                Object.keys(errors).forEach(key => {
+                    setError(key as keyof typeof data, errors[key]);
+                });
+            },
+        });
     };
 
     return (
@@ -190,14 +220,16 @@ export default function EditAttraction({ village, attraction }: Props) {
                             </Field>
                         </div>
                         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <MediaUploader
-                                existing={attraction.media}
-                                uploadRoute="/manager/village/media"
-                                deleteRoute={(id) => `/manager/media/${id}`}
-                                label="Foto Wisata / Atraksi"
-                                maxFiles={10}
-                                onMediaChange={(ids) =>
-                                    setData('media_ids', ids)
+                            <MediaInput
+                                label="Foto/Video Wisata / Atraksi"
+                                maxFiles={15}
+                                existingMedia={attraction.media}
+                                onChange={(selectedFiles, selectedExistingIds) => {
+                                    setFiles(selectedFiles);
+                                    setExistingMediaIds(selectedExistingIds);
+                                }}
+                            />
+                        </div>
                                 }
                             />
                         </div>

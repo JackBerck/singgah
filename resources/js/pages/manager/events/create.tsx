@@ -1,11 +1,12 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { Save } from 'lucide-react';
+import { useState } from 'react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
 import DatePicker from '@/components/manager/DatePicker';
-import MediaUploader from '@/components/manager/MediaUploader';
+import MediaInput from '@/components/manager/MediaInput';
 
 interface Village {
     id: number;
@@ -52,7 +53,8 @@ function Input(
 }
 
 export default function CreateEvent({ village }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
+    const [files, setFiles] = useState<File[]>([]);
+    const { data, setData, processing, errors, setError, clearErrors } = useForm({
         name: '',
         description: '',
         event_date: '',
@@ -60,12 +62,31 @@ export default function CreateEvent({ village }: Props) {
         location: '',
         contact_info: '',
         is_featured: false,
-        media_ids: [] as number[],
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/manager/events');
+        
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('event_date', data.event_date);
+        formData.append('end_date', data.end_date);
+        formData.append('location', data.location);
+        formData.append('contact_info', data.contact_info);
+        formData.append('is_featured', data.is_featured ? '1' : '0');
+        
+        files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        router.post('/manager/events', formData, {
+            onError: (errors) => {
+                Object.keys(errors).forEach(key => {
+                    setError(key as keyof typeof data, errors[key]);
+                });
+            },
+        });
     };
 
     return (
@@ -173,17 +194,10 @@ export default function CreateEvent({ village }: Props) {
 
                         {/* Media Upload */}
                         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <MediaUploader
-                                uploadRoute="/manager/village/media"
-                                deleteRoute={(id) =>
-                                    `/manager/village/media/${id}`
-                                }
-                                label="Foto Acara"
-                                maxFiles={5}
-                                maxSizeMB={5}
-                                onMediaChange={(ids) =>
-                                    setData('media_ids', ids)
-                                }
+                            <MediaInput
+                                label="Foto/Video Acara"
+                                maxFiles={10}
+                                onChange={(selectedFiles) => setFiles(selectedFiles)}
                             />
                         </div>
                     </div>

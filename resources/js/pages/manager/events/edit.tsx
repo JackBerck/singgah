@@ -1,11 +1,12 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { Save } from 'lucide-react';
+import { useState } from 'react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
 import DatePicker from '@/components/manager/DatePicker';
-import MediaUploader from '@/components/manager/MediaUploader';
+import MediaInput from '@/components/manager/MediaInput';
 
 interface Village {
     id: number;
@@ -80,7 +81,12 @@ const toISO = (s: string | null) => {
 };
 
 export default function EditEvent({ village, event }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
+    const [files, setFiles] = useState<File[]>([]);
+    const [existingMediaIds, setExistingMediaIds] = useState<number[]>(
+        event.media.map((m) => m.id)
+    );
+    
+    const { data, setData, processing, errors, setError } = useForm({
         name: event.name,
         description: event.description,
         event_date: toISO(event.event_date),
@@ -88,12 +94,36 @@ export default function EditEvent({ village, event }: Props) {
         location: event.location ?? '',
         contact_info: event.contact_info ?? '',
         is_featured: event.is_featured,
-        media_ids: [] as number[],
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/manager/events/${event.id}`);
+        
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('event_date', data.event_date);
+        formData.append('end_date', data.end_date);
+        formData.append('location', data.location);
+        formData.append('contact_info', data.contact_info);
+        formData.append('is_featured', data.is_featured ? '1' : '0');
+        
+        existingMediaIds.forEach((id) => {
+            formData.append('existing_media_ids[]', id.toString());
+        });
+        
+        files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        router.post(`/manager/events/${event.id}`, formData, {
+            onError: (errors) => {
+                Object.keys(errors).forEach(key => {
+                    setError(key as keyof typeof data, errors[key]);
+                });
+            },
+        });
     };
 
     return (
@@ -197,13 +227,14 @@ export default function EditEvent({ village, event }: Props) {
 
                         {/* Media */}
                         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <MediaUploader
-                                existing={event.media}
-                                uploadRoute="/manager/village/media"
-                                deleteRoute={(id) => `/manager/media/${id}`}
-                                label="Foto Acara"
-                                maxFiles={5}
-                                onMediaChange={(ids) => setData('media_ids', ids)}
+                            <MediaInput
+                                label="Foto/Video Acara"
+                                maxFiles={10}
+                                existingMedia={event.media}
+                                onChange={(selectedFiles, selectedExistingIds) => {
+                                    setFiles(selectedFiles);
+                                    setExistingMediaIds(selectedExistingIds);
+                                }}
                             />
                         </div>
                     </div>

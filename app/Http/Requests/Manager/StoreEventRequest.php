@@ -21,8 +21,10 @@ class StoreEventRequest extends FormRequest
             'location'     => ['nullable', 'string', 'max:255'],
             'contact_info' => ['nullable', 'string', 'max:255'],
             'is_featured'  => ['boolean'],
-            'media_ids'    => ['nullable', 'array'],
-            'media_ids.*'  => ['integer', 'exists:media,id'],
+            'existing_media_ids' => ['nullable', 'array'],
+            'existing_media_ids.*' => ['integer', 'exists:media,id'],
+            'files'        => ['nullable', 'array', 'max:10'],
+            'files.*'      => ['file', 'mimes:jpg,jpeg,png,webp,gif,mp4,webm', 'max:51200'],
         ];
     }
 
