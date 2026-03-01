@@ -3,7 +3,10 @@ import { Plus } from 'lucide-react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
-import DataTable, { Column } from '@/components/manager/DataTable';
+import DataTable, {
+    Column,
+    PaginationMeta,
+} from '@/components/manager/DataTable';
 
 interface Accommodation {
     id: number;
@@ -21,7 +24,15 @@ interface Village {
 }
 interface Props {
     village: Village;
-    accommodations: { data: Accommodation[] };
+    accommodations: {
+        data: Accommodation[];
+        current_page: number;
+        last_page: number;
+        from: number | null;
+        to: number | null;
+        total: number;
+        path: string;
+    };
 }
 
 const fmt = (n: number | null) =>
@@ -43,7 +54,7 @@ const columns: Column<Accommodation>[] = [
                 max = fmt(r.price_max);
             if (!min && !max)
                 return <span className="text-gray-400 italic">—</span>;
-            return `${min ?? '?'}${max && max !== min ? ` - ${max}` : ''}`;
+            return `${min ?? '?'}${max && max !== min ? ` – ${max}` : ''}`;
         },
     },
     {
@@ -66,6 +77,15 @@ export default function AccommodationsIndex({
     village,
     accommodations,
 }: Props) {
+    const pagination: PaginationMeta = {
+        current_page: accommodations.current_page,
+        last_page: accommodations.last_page,
+        from: accommodations.from,
+        to: accommodations.to,
+        total: accommodations.total,
+        path: accommodations.path,
+    };
+
     return (
         <ManagerLayout title="Akomodasi" village={village}>
             <PageHeader
@@ -88,6 +108,7 @@ export default function AccommodationsIndex({
             <DataTable
                 columns={columns}
                 data={accommodations.data}
+                pagination={pagination}
                 editHref={(r) => `/manager/accommodations/${r.id}/edit`}
                 deleteRoute={(r) => `/manager/accommodations/${r.id}`}
                 deleteConfirmMessage={(r) => `Hapus akomodasi "${r.name}"?`}

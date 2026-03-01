@@ -7,6 +7,7 @@ use App\Http\Controllers\Manager\AttractionController;
 use App\Http\Controllers\Manager\CulinaryController;
 use App\Http\Controllers\Manager\DashboardController;
 use App\Http\Controllers\Manager\EventController;
+use App\Http\Controllers\Manager\MediaController;
 use App\Http\Controllers\Manager\ReviewController;
 use App\Http\Controllers\Manager\VillageController;
 use App\Http\Controllers\Manager\VillageMediaController;
@@ -43,6 +44,9 @@ Route::prefix('manager')
         // Village Media
         Route::post('/village/media', [VillageMediaController::class, 'store'])->name('village.media.store');
         Route::delete('/village/media/{media}', [VillageMediaController::class, 'destroy'])->name('village.media.destroy');
+
+        // Generic Media Delete (for all entity types)
+        Route::delete('/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
 
         // Events CRUD
         Route::resource('events', EventController::class)->except(['show']);

@@ -336,7 +336,7 @@
 
     /* ── Singgah Auth Layout ── */
     .auth-layout-root {
-        @apply flex min-h-svh;
+        @apply flex min-h-svh w-full overflow-x-hidden;
     }
 
     .auth-panel-left {

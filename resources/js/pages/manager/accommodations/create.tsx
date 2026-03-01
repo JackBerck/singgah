@@ -4,6 +4,7 @@ import { Save } from 'lucide-react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
+import MediaUploader from '@/components/manager/MediaUploader';
 
 interface Village {
     id: number;
@@ -44,7 +45,7 @@ function Input(
     return (
         <input
             {...rest}
-            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-[var(--singgah-green-500)] focus:ring-2 focus:ring-[var(--singgah-green-100)] ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
+            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-(--singgah-green-500) focus:ring-2 focus:ring-(--singgah-green-100) ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
         />
     );
 }
@@ -58,8 +59,8 @@ export default function CreateAccommodation({ village }: Props) {
         location: '',
         contact_info: '',
         operating_hours: '',
+        media_ids: [] as number[],
     });
-
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/manager/accommodations');
@@ -179,6 +180,20 @@ export default function CreateAccommodation({ village }: Props) {
                                     hasError={!!errors.contact_info}
                                 />
                             </Field>
+                        </div>
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <MediaUploader
+                                uploadRoute="/manager/village/media"
+                                deleteRoute={(id) =>
+                                    `/manager/village/media/${id}`
+                                }
+                                label="Foto Akomodasi"
+                                maxFiles={10}
+                                maxSizeMB={5}
+                                onMediaChange={(ids) =>
+                                    setData('media_ids', ids)
+                                }
+                            />
                         </div>
                     </div>
                     <div>

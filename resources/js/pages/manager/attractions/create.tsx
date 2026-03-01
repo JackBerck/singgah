@@ -4,6 +4,7 @@ import { Save } from 'lucide-react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
+import MediaUploader from '@/components/manager/MediaUploader';
 
 interface Village {
     id: number;
@@ -44,7 +45,7 @@ function Input(
     return (
         <input
             {...rest}
-            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-[var(--singgah-green-500)] focus:ring-2 focus:ring-[var(--singgah-green-100)] ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
+            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-(--singgah-green-500) focus:ring-2 focus:ring-(--singgah-green-100) ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
         />
     );
 }
@@ -58,8 +59,8 @@ export default function CreateAttraction({ village }: Props) {
         location: '',
         contact_info: '',
         operating_hours: '',
+        media_ids: [] as number[],
     });
-
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/manager/attractions');
@@ -145,7 +146,6 @@ export default function CreateAttraction({ village }: Props) {
                                         onChange={(e) =>
                                             setData('location', e.target.value)
                                         }
-                                        placeholder="Blok B, dekat masjid"
                                         hasError={!!errors.location}
                                     />
                                 </Field>
@@ -161,7 +161,7 @@ export default function CreateAttraction({ village }: Props) {
                                                 e.target.value,
                                             )
                                         }
-                                        placeholder="08.00 - 17.00 WIB"
+                                        placeholder="08.00 – 17.00 WIB"
                                         hasError={!!errors.operating_hours}
                                     />
                                 </Field>
@@ -180,15 +180,24 @@ export default function CreateAttraction({ village }: Props) {
                                 />
                             </Field>
                         </div>
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <MediaUploader
+                                uploadRoute="/manager/village/media"
+                                deleteRoute={(id) =>
+                                    `/manager/village/media/${id}`
+                                }
+                                label="Foto Wisata / Atraksi"
+                                maxFiles={10}
+                                onMediaChange={(ids) =>
+                                    setData('media_ids', ids)
+                                }
+                            />
+                        </div>
                     </div>
                     <div>
                         <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                             <p className="text-sm font-bold tracking-wide text-gray-500 uppercase">
                                 Simpan
-                            </p>
-                            <p className="text-xs text-gray-500">
-                                Isi semua informasi yang diperlukan sebelum
-                                menyimpan.
                             </p>
                             <button
                                 type="submit"

@@ -4,6 +4,7 @@ import { CheckCircle2, Save } from 'lucide-react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
+import MediaUploader from '@/components/manager/MediaUploader';
 
 interface Village {
     id: number;
@@ -16,7 +17,12 @@ interface Village {
     longitude: number | null;
     map_url: string | null;
     status: 'pending' | 'verified' | 'rejected';
-    media: { id: number; path: string }[];
+    media: {
+        id: number;
+        file_path: string;
+        type: 'image' | 'video';
+        alt_text?: string;
+    }[];
 }
 
 interface Props {
@@ -250,6 +256,22 @@ export default function EditVillage({ village }: Props) {
                                     error={errors.map_url}
                                 />
                             </InputField>
+                        </div>
+
+                        {/* Media Gallery Card */}
+                        <div className="space-y-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <p className="text-sm font-bold tracking-wide text-gray-500 uppercase">
+                                Galeri Foto/Video Desa
+                            </p>
+                            <MediaUploader
+                                existing={village.media}
+                                uploadRoute="/manager/village/media"
+                                deleteRoute={(id) => `/manager/media/${id}`}
+                                label="Upload Foto/Video"
+                                maxFiles={15}
+                                maxSizeMB={10}
+                                allowVideo={true}
+                            />
                         </div>
                     </div>
 

@@ -14,6 +14,7 @@ import {
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import StatCard from '@/components/manager/StatCard';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface Village {
     id: number;
@@ -155,41 +156,33 @@ export default function Dashboard({
                 subtitle={`Kelola konten untuk ${village.name}`}
             />
 
-            {/* Rejection Alert */}
+            {/* Rejection Alert — Shadcn */}
             {stats.status === 'rejected' && stats.rejected_reason && (
-                <div className="mb-6 flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4">
-                    <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
-                    <div>
-                        <p className="text-sm font-semibold text-red-700">
-                            Desa Ditolak
-                        </p>
-                        <p className="mt-0.5 text-sm text-red-600">
-                            {stats.rejected_reason}
-                        </p>
+                <Alert variant="destructive" className="mb-6">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Desa Ditolak</AlertTitle>
+                    <AlertDescription>
+                        {stats.rejected_reason}{' '}
                         <Link
                             href="/manager/village/edit"
-                            className="mt-2 inline-block text-xs font-semibold text-red-700 underline"
+                            className="font-semibold underline underline-offset-2"
                         >
                             Perbarui profil desa →
                         </Link>
-                    </div>
-                </div>
+                    </AlertDescription>
+                </Alert>
             )}
 
-            {/* Pending Notice */}
+            {/* Pending Notice — Shadcn */}
             {stats.status === 'pending' && (
-                <div className="mb-6 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                    <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-                    <div>
-                        <p className="text-sm font-semibold text-amber-700">
-                            Menunggu Verifikasi
-                        </p>
-                        <p className="mt-0.5 text-sm text-amber-600">
-                            Profil desa Anda sedang ditinjau oleh tim Singgah.
-                            Ini biasanya membutuhkan waktu 1-3 hari kerja.
-                        </p>
-                    </div>
-                </div>
+                <Alert className="mb-6 border-amber-200 bg-amber-50 text-amber-800 [&>svg]:text-amber-600">
+                    <Clock className="h-4 w-4" />
+                    <AlertTitle>Menunggu Verifikasi</AlertTitle>
+                    <AlertDescription>
+                        Profil desa Anda sedang ditinjau oleh tim Singgah.
+                        Biasanya membutuhkan 1–3 hari kerja.
+                    </AlertDescription>
+                </Alert>
             )}
 
             {/* Stats Grid */}
@@ -246,7 +239,7 @@ export default function Dashboard({
                 </Link>
             </div>
 
-            {/* Recent Content Grids */}
+            {/* Recent Content */}
             <p className="mb-4 text-sm font-bold tracking-wider text-gray-500 uppercase">
                 Konten Terbaru
             </p>

@@ -4,12 +4,19 @@ import { Save } from 'lucide-react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
+import MediaUploader from '@/components/manager/MediaUploader';
 
 interface Village {
     id: number;
     name: string;
     slug: string;
     status: 'pending' | 'verified' | 'rejected';
+}
+interface Media {
+    id: number;
+    file_path: string;
+    type: 'image' | 'video';
+    alt_text?: string;
 }
 interface Culinary {
     id: number;
@@ -19,6 +26,7 @@ interface Culinary {
     price_max: number | null;
     location: string | null;
     contact_info: string | null;
+    media: Media[];
 }
 interface Props {
     village: Village;
@@ -54,7 +62,7 @@ function Input(
     return (
         <input
             {...rest}
-            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-[var(--singgah-green-500)] focus:ring-2 focus:ring-[var(--singgah-green-100)] ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
+            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-(--singgah-green-500) focus:ring-2 focus:ring-(--singgah-green-100) ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
         />
     );
 }
@@ -67,8 +75,8 @@ export default function EditCulinary({ village, culinary }: Props) {
         price_max: culinary.price_max?.toString() ?? '',
         location: culinary.location ?? '',
         contact_info: culinary.contact_info ?? '',
+        media_ids: [] as number[],
     });
-
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         put(`/manager/culinaries/${culinary.id}`);
@@ -166,6 +174,18 @@ export default function EditCulinary({ village, culinary }: Props) {
                                     />
                                 </Field>
                             </div>
+                        </div>
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <MediaUploader
+                                existing={culinary.media}
+                                uploadRoute="/manager/village/media"
+                                deleteRoute={(id) => `/manager/media/${id}`}
+                                label="Foto Kuliner / UMKM"
+                                maxFiles={5}
+                                onMediaChange={(ids) =>
+                                    setData('media_ids', ids)
+                                }
+                            />
                         </div>
                     </div>
                     <div>

@@ -300,7 +300,7 @@ export default function ManagerLayout({ children, title, village }: Props) {
 
             {/* Main Content */}
             <div
-                className={`flex min-h-screen flex-1 flex-col transition-all duration-300 ${collapsed ? 'lg:ml-16' : 'lg:ml-64'}`}
+                className={`flex min-h-screen w-full flex-1 flex-col overflow-x-hidden transition-all duration-300 ${collapsed ? 'lg:ml-16' : 'lg:ml-64'}`}
             >
                 {/* Mobile Topbar */}
                 <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-gray-100 bg-white px-4 py-3 lg:hidden">

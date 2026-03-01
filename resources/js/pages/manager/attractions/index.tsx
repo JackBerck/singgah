@@ -3,7 +3,10 @@ import { Plus } from 'lucide-react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
-import DataTable, { Column } from '@/components/manager/DataTable';
+import DataTable, {
+    Column,
+    PaginationMeta,
+} from '@/components/manager/DataTable';
 
 interface Attraction {
     id: number;
@@ -21,7 +24,15 @@ interface Village {
 }
 interface Props {
     village: Village;
-    attractions: { data: Attraction[] };
+    attractions: {
+        data: Attraction[];
+        current_page: number;
+        last_page: number;
+        from: number | null;
+        to: number | null;
+        total: number;
+        path: string;
+    };
 }
 
 const fmt = (n: number | null) =>
@@ -44,9 +55,9 @@ const columns: Column<Attraction>[] = [
             if (!min && !max)
                 return <span className="text-gray-400 italic">Gratis / —</span>;
             return (
-                <span className="text-sm">
+                <span>
                     {min ?? '?'}
-                    {max && max !== min ? ` - ${max}` : ''}
+                    {max && max !== min ? ` – ${max}` : ''}
                 </span>
             );
         },
@@ -68,6 +79,15 @@ const columns: Column<Attraction>[] = [
 ];
 
 export default function AttractionsIndex({ village, attractions }: Props) {
+    const pagination: PaginationMeta = {
+        current_page: attractions.current_page,
+        last_page: attractions.last_page,
+        from: attractions.from,
+        to: attractions.to,
+        total: attractions.total,
+        path: attractions.path,
+    };
+
     return (
         <ManagerLayout title="Wisata & Atraksi" village={village}>
             <PageHeader
@@ -90,6 +110,7 @@ export default function AttractionsIndex({ village, attractions }: Props) {
             <DataTable
                 columns={columns}
                 data={attractions.data}
+                pagination={pagination}
                 editHref={(r) => `/manager/attractions/${r.id}/edit`}
                 deleteRoute={(r) => `/manager/attractions/${r.id}`}
                 deleteConfirmMessage={(r) => `Hapus wisata "${r.name}"?`}

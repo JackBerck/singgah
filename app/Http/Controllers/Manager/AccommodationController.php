@@ -42,7 +42,22 @@ class AccommodationController extends Controller
         $data    = $request->validated();
         $data['village_id'] = $village->id;
         $data['slug']       = Str::slug($data['name']) . '-' . now()->timestamp;
-        Accommodation::create($data);
+
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $accommodation = Accommodation::create($data);
+
+        // Attach media from village to accommodation
+        if (!empty($mediaIds)) {
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => Accommodation::class,
+                    'mediable_id'   => $accommodation->id,
+                ]);
+        }
 
         return redirect()->route('manager.accommodations.index')
             ->with('success', 'Akomodasi berhasil ditambahkan.');
@@ -51,6 +66,9 @@ class AccommodationController extends Controller
     public function edit(Request $request, Accommodation $accommodation): Response
     {
         abort_unless($accommodation->village_id === $this->village($request)->id, 403);
+
+        $accommodation->load('media');
+
         return Inertia::render('manager/accommodations/edit', [
             'village'       => $this->village($request),
             'accommodation' => $accommodation,
@@ -60,7 +78,24 @@ class AccommodationController extends Controller
     public function update(UpdateAccommodationRequest $request, Accommodation $accommodation): RedirectResponse
     {
         abort_unless($accommodation->village_id === $this->village($request)->id, 403);
-        $accommodation->update($request->validated());
+
+        $data = $request->validated();
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $accommodation->update($data);
+
+        // Attach new media from village to accommodation
+        if (!empty($mediaIds)) {
+            $village = $this->village($request);
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => Accommodation::class,
+                    'mediable_id'   => $accommodation->id,
+                ]);
+        }
 
         return redirect()->route('manager.accommodations.index')
             ->with('success', 'Akomodasi berhasil diperbarui.');

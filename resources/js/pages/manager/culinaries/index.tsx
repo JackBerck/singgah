@@ -3,7 +3,10 @@ import { Plus } from 'lucide-react';
 
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
-import DataTable, { Column } from '@/components/manager/DataTable';
+import DataTable, {
+    Column,
+    PaginationMeta,
+} from '@/components/manager/DataTable';
 
 interface Culinary {
     id: number;
@@ -20,7 +23,15 @@ interface Village {
 }
 interface Props {
     village: Village;
-    culinaries: { data: Culinary[] };
+    culinaries: {
+        data: Culinary[];
+        current_page: number;
+        last_page: number;
+        from: number | null;
+        to: number | null;
+        total: number;
+        path: string;
+    };
 }
 
 const fmt = (n: number | null) =>
@@ -42,7 +53,7 @@ const columns: Column<Culinary>[] = [
                 max = fmt(r.price_max);
             if (!min && !max)
                 return <span className="text-gray-400 italic">—</span>;
-            return `${min ?? '?'}${max && max !== min ? ` - ${max}` : ''}`;
+            return `${min ?? '?'}${max && max !== min ? ` – ${max}` : ''}`;
         },
     },
     {
@@ -54,6 +65,15 @@ const columns: Column<Culinary>[] = [
 ];
 
 export default function CulinarysIndex({ village, culinaries }: Props) {
+    const pagination: PaginationMeta = {
+        current_page: culinaries.current_page,
+        last_page: culinaries.last_page,
+        from: culinaries.from,
+        to: culinaries.to,
+        total: culinaries.total,
+        path: culinaries.path,
+    };
+
     return (
         <ManagerLayout title="Kuliner & UMKM" village={village}>
             <PageHeader
@@ -76,6 +96,7 @@ export default function CulinarysIndex({ village, culinaries }: Props) {
             <DataTable
                 columns={columns}
                 data={culinaries.data}
+                pagination={pagination}
                 editHref={(r) => `/manager/culinaries/${r.id}/edit`}
                 deleteRoute={(r) => `/manager/culinaries/${r.id}`}
                 deleteConfirmMessage={(r) => `Hapus kuliner "${r.name}"?`}

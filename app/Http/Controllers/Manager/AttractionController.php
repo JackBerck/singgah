@@ -42,7 +42,22 @@ class AttractionController extends Controller
         $data    = $request->validated();
         $data['village_id'] = $village->id;
         $data['slug']       = Str::slug($data['name']) . '-' . now()->timestamp;
-        Attraction::create($data);
+
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $attraction = Attraction::create($data);
+
+        // Attach media from village to attraction
+        if (!empty($mediaIds)) {
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => Attraction::class,
+                    'mediable_id'   => $attraction->id,
+                ]);
+        }
 
         return redirect()->route('manager.attractions.index')
             ->with('success', 'Wisata/Atraksi berhasil ditambahkan.');
@@ -51,6 +66,9 @@ class AttractionController extends Controller
     public function edit(Request $request, Attraction $attraction): Response
     {
         abort_unless($attraction->village_id === $this->village($request)->id, 403);
+
+        $attraction->load('media');
+
         return Inertia::render('manager/attractions/edit', [
             'village'    => $this->village($request),
             'attraction' => $attraction,
@@ -60,7 +78,24 @@ class AttractionController extends Controller
     public function update(UpdateAttractionRequest $request, Attraction $attraction): RedirectResponse
     {
         abort_unless($attraction->village_id === $this->village($request)->id, 403);
-        $attraction->update($request->validated());
+
+        $data = $request->validated();
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $attraction->update($data);
+
+        // Attach new media from village to attraction
+        if (!empty($mediaIds)) {
+            $village = $this->village($request);
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => Attraction::class,
+                    'mediable_id'   => $attraction->id,
+                ]);
+        }
 
         return redirect()->route('manager.attractions.index')
             ->with('success', 'Wisata/Atraksi berhasil diperbarui.');

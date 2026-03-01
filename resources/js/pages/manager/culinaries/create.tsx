@@ -4,6 +4,7 @@ import { Save } from 'lucide-react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
+import MediaUploader from '@/components/manager/MediaUploader';
 
 interface Village {
     id: number;
@@ -44,7 +45,7 @@ function Input(
     return (
         <input
             {...rest}
-            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-[var(--singgah-green-500)] focus:ring-2 focus:ring-[var(--singgah-green-100)] ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
+            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-(--singgah-green-500) focus:ring-2 focus:ring-(--singgah-green-100) ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
         />
     );
 }
@@ -57,8 +58,8 @@ export default function CreateCulinary({ village }: Props) {
         price_max: '',
         location: '',
         contact_info: '',
+        media_ids: [] as number[],
     });
-
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/manager/culinaries');
@@ -88,7 +89,7 @@ export default function CreateCulinary({ village }: Props) {
                                     onChange={(e) =>
                                         setData('name', e.target.value)
                                     }
-                                    placeholder="Soto Ayam Pak Joko"
+                                    placeholder="Gudeg Bu Sari"
                                     hasError={!!errors.name}
                                 />
                             </Field>
@@ -107,7 +108,7 @@ export default function CreateCulinary({ village }: Props) {
                             </Field>
                             <div className="grid grid-cols-2 gap-4">
                                 <Field
-                                    label="Harga Min (Rp)"
+                                    label="Harga Minimum (Rp)"
                                     error={errors.price_min}
                                 >
                                     <Input
@@ -122,7 +123,7 @@ export default function CreateCulinary({ village }: Props) {
                                     />
                                 </Field>
                                 <Field
-                                    label="Harga Maks (Rp)"
+                                    label="Harga Maksimum (Rp)"
                                     error={errors.price_max}
                                 >
                                     <Input
@@ -132,7 +133,7 @@ export default function CreateCulinary({ village }: Props) {
                                         onChange={(e) =>
                                             setData('price_max', e.target.value)
                                         }
-                                        placeholder="30000"
+                                        placeholder="25000"
                                         hasError={!!errors.price_max}
                                     />
                                 </Field>
@@ -144,7 +145,7 @@ export default function CreateCulinary({ village }: Props) {
                                         onChange={(e) =>
                                             setData('location', e.target.value)
                                         }
-                                        placeholder="Pasar desa, Blok A"
+                                        placeholder="Depan Balai Desa"
                                         hasError={!!errors.location}
                                     />
                                 </Field>
@@ -160,17 +161,35 @@ export default function CreateCulinary({ village }: Props) {
                                                 e.target.value,
                                             )
                                         }
-                                        placeholder="0812-xxxx-xxxx"
+                                        placeholder="0812-xxxx-xxxx / WA"
                                         hasError={!!errors.contact_info}
                                     />
                                 </Field>
                             </div>
+                        </div>
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <MediaUploader
+                                uploadRoute="/manager/village/media"
+                                deleteRoute={(id) =>
+                                    `/manager/village/media/${id}`
+                                }
+                                label="Foto Kuliner / UMKM"
+                                maxFiles={5}
+                                maxSizeMB={5}
+                                onMediaChange={(ids) =>
+                                    setData('media_ids', ids)
+                                }
+                            />
                         </div>
                     </div>
                     <div>
                         <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                             <p className="text-sm font-bold tracking-wide text-gray-500 uppercase">
                                 Simpan
+                            </p>
+                            <p className="text-xs text-gray-500">
+                                Foto menarik dapat meningkatkan minat
+                                pengunjung.
                             </p>
                             <button
                                 type="submit"

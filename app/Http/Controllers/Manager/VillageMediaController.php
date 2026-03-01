@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class VillageMediaController extends Controller
 {
@@ -45,7 +44,7 @@ class VillageMediaController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, Media $media): RedirectResponse
+    public function destroy(Request $request, Media $media): JsonResponse|RedirectResponse
     {
         $village = $this->getVillage($request);
 
@@ -57,6 +56,10 @@ class VillageMediaController extends Controller
 
         Storage::disk('public')->delete($media->file_path);
         $media->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Foto berhasil dihapus.']);
+        }
 
         return back()->with('success', 'Foto berhasil dihapus.');
     }

@@ -4,12 +4,19 @@ import { Save } from 'lucide-react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
+import MediaUploader from '@/components/manager/MediaUploader';
 
 interface Village {
     id: number;
     name: string;
     slug: string;
     status: 'pending' | 'verified' | 'rejected';
+}
+interface Media {
+    id: number;
+    file_path: string;
+    type: 'image' | 'video';
+    alt_text?: string;
 }
 interface Attraction {
     id: number;
@@ -20,6 +27,7 @@ interface Attraction {
     location: string | null;
     contact_info: string | null;
     operating_hours: string | null;
+    media: Media[];
 }
 interface Props {
     village: Village;
@@ -55,7 +63,7 @@ function Input(
     return (
         <input
             {...rest}
-            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-[var(--singgah-green-500)] focus:ring-2 focus:ring-[var(--singgah-green-100)] ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
+            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-(--singgah-green-500) focus:ring-2 focus:ring-(--singgah-green-100) ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
         />
     );
 }
@@ -69,8 +77,8 @@ export default function EditAttraction({ village, attraction }: Props) {
         location: attraction.location ?? '',
         contact_info: attraction.contact_info ?? '',
         operating_hours: attraction.operating_hours ?? '',
+        media_ids: [] as number[],
     });
-
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         put(`/manager/attractions/${attraction.id}`);
@@ -180,6 +188,18 @@ export default function EditAttraction({ village, attraction }: Props) {
                                     hasError={!!errors.contact_info}
                                 />
                             </Field>
+                        </div>
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <MediaUploader
+                                existing={attraction.media}
+                                uploadRoute="/manager/village/media"
+                                deleteRoute={(id) => `/manager/media/${id}`}
+                                label="Foto Wisata / Atraksi"
+                                maxFiles={10}
+                                onMediaChange={(ids) =>
+                                    setData('media_ids', ids)
+                                }
+                            />
                         </div>
                     </div>
                     <div>

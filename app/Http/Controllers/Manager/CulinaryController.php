@@ -42,7 +42,22 @@ class CulinaryController extends Controller
         $data    = $request->validated();
         $data['village_id'] = $village->id;
         $data['slug']       = Str::slug($data['name']) . '-' . now()->timestamp;
-        Culinary::create($data);
+
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $culinary = Culinary::create($data);
+
+        // Attach media from village to culinary
+        if (!empty($mediaIds)) {
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => Culinary::class,
+                    'mediable_id'   => $culinary->id,
+                ]);
+        }
 
         return redirect()->route('manager.culinaries.index')
             ->with('success', 'Kuliner berhasil ditambahkan.');
@@ -51,6 +66,9 @@ class CulinaryController extends Controller
     public function edit(Request $request, Culinary $culinary): Response
     {
         abort_unless($culinary->village_id === $this->village($request)->id, 403);
+
+        $culinary->load('media');
+
         return Inertia::render('manager/culinaries/edit', [
             'village'  => $this->village($request),
             'culinary' => $culinary,
@@ -60,7 +78,24 @@ class CulinaryController extends Controller
     public function update(UpdateCulinaryRequest $request, Culinary $culinary): RedirectResponse
     {
         abort_unless($culinary->village_id === $this->village($request)->id, 403);
-        $culinary->update($request->validated());
+
+        $data = $request->validated();
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $culinary->update($data);
+
+        // Attach new media from village to culinary
+        if (!empty($mediaIds)) {
+            $village = $this->village($request);
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => Culinary::class,
+                    'mediable_id'   => $culinary->id,
+                ]);
+        }
 
         return redirect()->route('manager.culinaries.index')
             ->with('success', 'Kuliner berhasil diperbarui.');

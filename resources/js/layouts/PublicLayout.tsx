@@ -9,7 +9,7 @@ interface PublicLayoutProps {
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
     return (
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen w-full flex-col overflow-x-hidden">
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

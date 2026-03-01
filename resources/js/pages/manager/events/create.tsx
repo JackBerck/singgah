@@ -4,6 +4,8 @@ import { Save } from 'lucide-react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
+import DatePicker from '@/components/manager/DatePicker';
+import MediaUploader from '@/components/manager/MediaUploader';
 
 interface Village {
     id: number;
@@ -37,7 +39,6 @@ function Field({
         </div>
     );
 }
-
 function Input(
     props: React.InputHTMLAttributes<HTMLInputElement> & { hasError?: boolean },
 ) {
@@ -45,7 +46,7 @@ function Input(
     return (
         <input
             {...rest}
-            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-[var(--singgah-green-500)] focus:ring-2 focus:ring-[var(--singgah-green-100)] ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
+            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-(--singgah-green-500) focus:ring-2 focus:ring-(--singgah-green-100) ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
         />
     );
 }
@@ -59,6 +60,7 @@ export default function CreateEvent({ village }: Props) {
         location: '',
         contact_info: '',
         is_featured: false,
+        media_ids: [] as number[],
     });
 
     const submit = (e: React.FormEvent) => {
@@ -79,6 +81,7 @@ export default function CreateEvent({ village }: Props) {
             <form onSubmit={submit}>
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
                     <div className="space-y-5 lg:col-span-2">
+                        {/* Basic Info */}
                         <div className="space-y-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                             <Field
                                 label="Nama Acara"
@@ -113,29 +116,28 @@ export default function CreateEvent({ village }: Props) {
                                     required
                                     error={errors.event_date}
                                 >
-                                    <Input
-                                        type="datetime-local"
+                                    <DatePicker
                                         value={data.event_date}
-                                        onChange={(e) =>
-                                            setData(
-                                                'event_date',
-                                                e.target.value,
-                                            )
+                                        onChange={(val) =>
+                                            setData('event_date', val)
                                         }
-                                        hasError={!!errors.event_date}
+                                        withTime
+                                        placeholder="Pilih tanggal mulai"
+                                        error={errors.event_date}
                                     />
                                 </Field>
                                 <Field
                                     label="Tanggal Selesai"
                                     error={errors.end_date}
                                 >
-                                    <Input
-                                        type="datetime-local"
+                                    <DatePicker
                                         value={data.end_date}
-                                        onChange={(e) =>
-                                            setData('end_date', e.target.value)
+                                        onChange={(val) =>
+                                            setData('end_date', val)
                                         }
-                                        hasError={!!errors.end_date}
+                                        withTime
+                                        placeholder="Pilih tanggal selesai"
+                                        error={errors.end_date}
                                     />
                                 </Field>
                             </div>
@@ -168,7 +170,25 @@ export default function CreateEvent({ village }: Props) {
                                 </Field>
                             </div>
                         </div>
+
+                        {/* Media Upload */}
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <MediaUploader
+                                uploadRoute="/manager/village/media"
+                                deleteRoute={(id) =>
+                                    `/manager/village/media/${id}`
+                                }
+                                label="Foto Acara"
+                                maxFiles={5}
+                                maxSizeMB={5}
+                                onMediaChange={(ids) =>
+                                    setData('media_ids', ids)
+                                }
+                            />
+                        </div>
                     </div>
+
+                    {/* Sidebar */}
                     <div className="space-y-5">
                         <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                             <p className="text-sm font-bold tracking-wide text-gray-500 uppercase">
@@ -181,7 +201,7 @@ export default function CreateEvent({ village }: Props) {
                                     onChange={(e) =>
                                         setData('is_featured', e.target.checked)
                                     }
-                                    className="h-4 w-4 rounded accent-[var(--singgah-green-600)]"
+                                    className="h-4 w-4 rounded accent-(--singgah-green-600)"
                                 />
                                 <span className="text-sm font-medium text-gray-700">
                                     Acara Unggulan

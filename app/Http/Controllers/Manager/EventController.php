@@ -47,7 +47,21 @@ class EventController extends Controller
         $data['village_id'] = $village->id;
         $data['slug']       = Str::slug($data['name']) . '-' . now()->timestamp;
 
-        VillageEvent::create($data);
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $event = VillageEvent::create($data);
+
+        // Attach media from village to event
+        if (!empty($mediaIds)) {
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => VillageEvent::class,
+                    'mediable_id'   => $event->id,
+                ]);
+        }
 
         return redirect()->route('manager.events.index')
             ->with('success', 'Acara berhasil ditambahkan.');
@@ -56,6 +70,8 @@ class EventController extends Controller
     public function edit(Request $request, VillageEvent $event): Response
     {
         abort_unless($event->village_id === $this->village($request)->id, 403);
+
+        $event->load('media');
 
         return Inertia::render('manager/events/edit', [
             'village' => $this->village($request),
@@ -66,7 +82,24 @@ class EventController extends Controller
     public function update(UpdateEventRequest $request, VillageEvent $event): RedirectResponse
     {
         abort_unless($event->village_id === $this->village($request)->id, 403);
-        $event->update($request->validated());
+
+        $data = $request->validated();
+        $mediaIds = $data['media_ids'] ?? [];
+        unset($data['media_ids']);
+
+        $event->update($data);
+
+        // Attach new media from village to event
+        if (!empty($mediaIds)) {
+            $village = $this->village($request);
+            \App\Models\Media::whereIn('id', $mediaIds)
+                ->where('mediable_type', \App\Models\Village::class)
+                ->where('mediable_id', $village->id)
+                ->update([
+                    'mediable_type' => VillageEvent::class,
+                    'mediable_id'   => $event->id,
+                ]);
+        }
 
         return redirect()->route('manager.events.index')
             ->with('success', 'Acara berhasil diperbarui.');

@@ -20,6 +20,8 @@ class StoreCulinaryRequest extends FormRequest
             'price_max'    => ['nullable', 'numeric', 'min:0', 'gte:price_min'],
             'location'     => ['nullable', 'string', 'max:255'],
             'contact_info' => ['nullable', 'string', 'max:255'],
+            'media_ids'    => ['nullable', 'array'],
+            'media_ids.*'  => ['integer', 'exists:media,id'],
         ];
     }
 
