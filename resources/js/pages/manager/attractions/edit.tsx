@@ -74,7 +74,7 @@ export default function EditAttraction({ village, attraction }: Props) {
     const [existingMediaIds, setExistingMediaIds] = useState<number[]>(
         attraction.media.map((m) => m.id)
     );
-    
+
     const { data, setData, processing, errors, setError } = useForm({
         name: attraction.name,
         description: attraction.description,
@@ -86,7 +86,7 @@ export default function EditAttraction({ village, attraction }: Props) {
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         const formData = new FormData();
         formData.append('_method', 'PUT');
         formData.append('name', data.name);
@@ -96,11 +96,11 @@ export default function EditAttraction({ village, attraction }: Props) {
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
         formData.append('operating_hours', data.operating_hours);
-        
+
         existingMediaIds.forEach((id) => {
             formData.append('existing_media_ids[]', id.toString());
         });
-        
+
         files.forEach((file) => {
             formData.append('files[]', file);
         });

@@ -64,7 +64,7 @@ export default function CreateAccommodation({ village }: Props) {
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         const formData = new FormData();
         formData.append('name', data.name);
         formData.append('description', data.description);
@@ -73,14 +73,14 @@ export default function CreateAccommodation({ village }: Props) {
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
         formData.append('operating_hours', data.operating_hours);
-        
+
         files.forEach((file) => {
             formData.append('files[]', file);
         });
 
         router.post('/manager/accommodations', formData, {
             onError: (errors) => {
-                Object.keys(errors).forEach(key => {
+                Object.keys(errors).forEach((key) => {
                     setError(key as keyof typeof data, errors[key]);
                 });
             },
@@ -206,7 +206,9 @@ export default function CreateAccommodation({ village }: Props) {
                             <MediaInput
                                 label="Foto/Video Akomodasi"
                                 maxFiles={15}
-                                onChange={(selectedFiles) => setFiles(selectedFiles)}
+                                onChange={(selectedFiles) =>
+                                    setFiles(selectedFiles)
+                                }
                             />
                         </div>
                     </div>

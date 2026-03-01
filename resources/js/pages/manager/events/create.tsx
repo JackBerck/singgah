@@ -54,19 +54,20 @@ function Input(
 
 export default function CreateEvent({ village }: Props) {
     const [files, setFiles] = useState<File[]>([]);
-    const { data, setData, processing, errors, setError, clearErrors } = useForm({
-        name: '',
-        description: '',
-        event_date: '',
-        end_date: '',
-        location: '',
-        contact_info: '',
-        is_featured: false,
-    });
+    const { data, setData, processing, errors, setError, clearErrors } =
+        useForm({
+            name: '',
+            description: '',
+            event_date: '',
+            end_date: '',
+            location: '',
+            contact_info: '',
+            is_featured: false,
+        });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         const formData = new FormData();
         formData.append('name', data.name);
         formData.append('description', data.description);
@@ -75,14 +76,14 @@ export default function CreateEvent({ village }: Props) {
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
         formData.append('is_featured', data.is_featured ? '1' : '0');
-        
+
         files.forEach((file) => {
             formData.append('files[]', file);
         });
 
         router.post('/manager/events', formData, {
             onError: (errors) => {
-                Object.keys(errors).forEach(key => {
+                Object.keys(errors).forEach((key) => {
                     setError(key as keyof typeof data, errors[key]);
                 });
             },
@@ -197,7 +198,9 @@ export default function CreateEvent({ village }: Props) {
                             <MediaInput
                                 label="Foto/Video Acara"
                                 maxFiles={10}
-                                onChange={(selectedFiles) => setFiles(selectedFiles)}
+                                onChange={(selectedFiles) =>
+                                    setFiles(selectedFiles)
+                                }
                             />
                         </div>
                     </div>

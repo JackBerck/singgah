@@ -343,9 +343,7 @@ export default function MediaInput({
                 onChange={(e) => handleFiles(e.target.files)}
             />
 
-            {error && (
-                <p className="mt-2 text-xs text-red-500">⚠️ {error}</p>
-            )}
+            {error && <p className="mt-2 text-xs text-red-500">⚠️ {error}</p>}
             {externalError && (
                 <p className="mt-2 text-xs text-red-500">⚠️ {externalError}</p>
             )}

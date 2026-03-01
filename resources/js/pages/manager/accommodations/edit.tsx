@@ -72,9 +72,9 @@ function Input(
 export default function EditAccommodation({ village, accommodation }: Props) {
     const [files, setFiles] = useState<File[]>([]);
     const [existingMediaIds, setExistingMediaIds] = useState<number[]>(
-        accommodation.media.map((m) => m.id)
+        accommodation.media.map((m) => m.id),
     );
-    
+
     const { data, setData, processing, errors, setError } = useForm({
         name: accommodation.name,
         description: accommodation.description,
@@ -86,7 +86,7 @@ export default function EditAccommodation({ village, accommodation }: Props) {
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         const formData = new FormData();
         formData.append('_method', 'PUT');
         formData.append('name', data.name);
@@ -96,18 +96,18 @@ export default function EditAccommodation({ village, accommodation }: Props) {
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
         formData.append('operating_hours', data.operating_hours);
-        
+
         existingMediaIds.forEach((id) => {
             formData.append('existing_media_ids[]', id.toString());
         });
-        
+
         files.forEach((file) => {
             formData.append('files[]', file);
         });
 
         router.post(`/manager/accommodations/${accommodation.id}`, formData, {
             onError: (errors) => {
-                Object.keys(errors).forEach(key => {
+                Object.keys(errors).forEach((key) => {
                     setError(key as keyof typeof data, errors[key]);
                 });
             },
@@ -224,7 +224,10 @@ export default function EditAccommodation({ village, accommodation }: Props) {
                                 label="Foto/Video Akomodasi"
                                 maxFiles={15}
                                 existingMedia={accommodation.media}
-                                onChange={(selectedFiles, selectedExistingIds) => {
+                                onChange={(
+                                    selectedFiles,
+                                    selectedExistingIds,
+                                ) => {
                                     setFiles(selectedFiles);
                                     setExistingMediaIds(selectedExistingIds);
                                 }}
