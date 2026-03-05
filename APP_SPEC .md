@@ -194,3 +194,80 @@ Pembedaan role yang jelas:
 - `.faq-item` — FAQ accordion container
 - `.step-card`, `.step-number-bg` — "Cara Kerja" step cards
 - `.value-card` — feature/value cards dengan hover lift
+
+## 11. HALAMAN JELAJAHI DESA (`/explore`)
+
+_Route: `GET /explore` → `ExploreController@index` → Inertia `explore` page_
+
+### Fitur Filter
+
+- **Pencarian teks** (`search`) — cocokkan name, short_description, address
+- **Wilayah/Provinsi** (`wilayah`) — string filter pada kolom address
+- **Sort** (`sort`) — `terbaru` | `rating` | `nama`
+- **Rating Minimum** (`rating_min`) — filter having avg_rating >= N
+
+### Layout
+
+- Desktop: sidebar filter kiri (sticky), grid desa kanan (3–4 kolom)
+- Mobile: tombol filter buka bottom sheet
+- Pagination: 12 desa/halaman, smart pagination
+- Semua filter ter-sync ke URL query string (bookmarkable)
+
+---
+
+## 12. PROFIL DESA & KONTEN
+
+### Halaman Utama Desa (`/desa/:slug`)
+
+**Layout**: sticky sidebar kiri + scrollable main content
+
+**Sidebar**: cover image, nama, rating, tab navigasi (Beranda | Event | Wisata | Kuliner | Akomodasi | Ulasan), info pengelola, alamat
+
+**Tab Beranda**: rich text desc, galeri lightbox, Google Maps embed, highlight 3 event + 3 wisata
+
+**Tab Event**: daftar event sorted by date, toggle Mendatang/Semua
+
+**Tab Wisata/Kuliner/Akomodasi**: grid kartu → klik ke halaman detail
+
+**Tab Ulasan**: aggregate rating breakdown + daftar review + ReviewForm
+
+### Halaman Detail Konten
+
+Routes: `GET /desa/{slug}/{type}/{id}` → galeri, rich text, harga, kontak, form ulasan
+
+---
+
+## 13. AUTENTIKASI ROLE-SPESIFIK
+
+**Register Pengunjung** (`/register`) — tambah role chooser (toggle Pengunjung vs Pengelola)
+
+**Register Pengelola** (`/register/pengelola`):
+
+- Form tambahan: telepon, nama desa, alamat desa, deskripsi singkat
+- Action: buat User (role=manager) + Village (status=pending)
+- Redirect → halaman sukses "Menunggu verifikasi admin"
+
+**Login** (`/login`) — tetap sama untuk semua role
+
+---
+
+## 14. HALAMAN PROFIL PENGGUNA (`/profil`)
+
+_Route: `GET /profil` [auth]_
+
+Tab: **Informasi Akun** (edit nama, telepon, alamat, avatar), **Keamanan** (ganti password), **Ulasan Saya** (riwayat + hapus)
+
+---
+
+## 15. REVIEW & RATING
+
+Routes: `POST /reviews` + `DELETE /reviews/{id}` [auth]
+
+- Max 1 review per user per entitas (unique constraint)
+- Rating 1–5 wajib, komentar opsional (max 1000 karakter)
+- Auto `is_visible = true`
+
+### CSS Utilities Tambahan
+
+- `.explore-filter-panel`, `.village-detail-sidebar`, `.village-tab-nav`
+- `.content-card`, `.review-item`, `.star-input`, `.media-lightbox`

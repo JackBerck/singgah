@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\ExploreController;
+use App\Http\Controllers\VillageProfileController;
+use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\Public\ReviewController as PublicReviewController;
+use App\Http\Controllers\Auth\RegisteredManagerController;
 use App\Http\Controllers\Manager\AccommodationController;
 use App\Http\Controllers\Manager\AttractionController;
 use App\Http\Controllers\Manager\CulinaryController;
@@ -23,6 +28,30 @@ Route::get('/tentang', [StaticPageController::class, 'about'])->name('about');
 Route::get('/privasi', [StaticPageController::class, 'privacy'])->name('privacy');
 Route::get('/syarat', [StaticPageController::class, 'terms'])->name('terms');
 
+// Explore & Village Profile
+Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
+Route::get('/desa/{slug}', [VillageProfileController::class, 'show'])->name('village.show');
+Route::get('/desa/{slug}/events/{id}', [VillageProfileController::class, 'showEvent'])->name('village.event');
+Route::get('/desa/{slug}/attractions/{id}', [VillageProfileController::class, 'showAttraction'])->name('village.attraction');
+Route::get('/desa/{slug}/culinaries/{id}', [VillageProfileController::class, 'showCulinary'])->name('village.culinary');
+Route::get('/desa/{slug}/accommodations/{id}', [VillageProfileController::class, 'showAccommodation'])->name('village.accommodation');
+
+// Manager Registration
+Route::get('/register/pengelola', [RegisteredManagerController::class, 'create'])->name('register.manager');
+Route::post('/register/pengelola', [RegisteredManagerController::class, 'store'])->name('register.manager.store');
+Route::get('/register/pengelola/sukses', [RegisteredManagerController::class, 'success'])->name('register.manager.success');
+
+// Authenticated-only routes
+Route::middleware(['auth'])->group(function () {
+    // Reviews
+    Route::post('/reviews', [PublicReviewController::class, 'store'])->name('reviews.store');
+    Route::delete('/reviews/{id}', [PublicReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // User Profile
+    Route::get('/profil', [UserProfileController::class, 'show'])->name('profil.show');
+    Route::post('/profil', [UserProfileController::class, 'update'])->name('profil.update');
+    Route::put('/profil/password', [UserProfileController::class, 'updatePassword'])->name('profil.password');
+});
 // ─── General Auth Dashboard ───────────────────────────────────────────────────
 
 Route::get('dashboard', function () {
