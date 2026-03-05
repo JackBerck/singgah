@@ -1,8 +1,8 @@
-import { useForm, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { Save } from 'lucide-react';
 import { useState } from 'react';
 
-import ManagerLayout from '@/layouts/ManagerLayout';
+import AdminLayout from '@/layouts/AdminLayout';
 import PageHeader from '@/components/manager/PageHeader';
 import RichEditor from '@/components/manager/RichEditor';
 import MediaInput from '@/components/manager/MediaInput';
@@ -10,8 +10,6 @@ import MediaInput from '@/components/manager/MediaInput';
 interface Village {
     id: number;
     name: string;
-    slug: string;
-    status: 'pending' | 'verified' | 'rejected';
 }
 interface Media {
     id: number;
@@ -19,20 +17,19 @@ interface Media {
     type: 'image' | 'video';
     alt_text?: string;
 }
-interface Attraction {
+interface Culinary {
     id: number;
     name: string;
     description: string;
-    price_min: number | null;
-    price_max: number | null;
     location: string | null;
     contact_info: string | null;
-    operating_hours: string | null;
+    price_min: number | null;
+    price_max: number | null;
+    village: Village;
     media: Media[];
 }
 interface Props {
-    village: Village;
-    attraction: Attraction;
+    culinary: Culinary;
 }
 
 function Field({
@@ -64,185 +61,174 @@ function Input(
     return (
         <input
             {...rest}
-            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-(--singgah-green-500) focus:ring-2 focus:ring-(--singgah-green-100) ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
+            className={`w-full rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 ${hasError ? 'border-red-400' : 'border-gray-200'} ${className ?? ''}`}
         />
     );
 }
 
-export default function EditAttraction({ village, attraction }: Props) {
+export default function AdminEditCulinary({ culinary }: Props) {
     const [files, setFiles] = useState<File[]>([]);
     const [existingMediaIds, setExistingMediaIds] = useState<number[]>(
-        attraction.media.map((m) => m.id),
+        culinary.media.map((m) => m.id),
     );
-
-    const { data, setData, processing, errors, setError } = useForm({
-        name: attraction.name,
-        description: attraction.description,
-        price_min: attraction.price_min?.toString() ?? '',
-        price_max: attraction.price_max?.toString() ?? '',
-        location: attraction.location ?? '',
-        contact_info: attraction.contact_info ?? '',
-        operating_hours: attraction.operating_hours ?? '',
+    const [processing, setProcessing] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [formData, setFormData] = useState({
+        name: culinary.name,
+        description: culinary.description,
+        location: culinary.location ?? '',
+        contact_info: culinary.contact_info ?? '',
+        price_min: String(culinary.price_min ?? ''),
+        price_max: String(culinary.price_max ?? ''),
     });
+
+    const set = (key: keyof typeof formData, value: string) =>
+        setFormData((prev) => ({ ...prev, [key]: value }));
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+        const fd = new FormData();
+        fd.append('_method', 'PUT');
+        Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
+        existingMediaIds.forEach((id) =>
+            fd.append('existing_media_ids[]', String(id)),
+        );
+        files.forEach((file) => fd.append('files[]', file));
 
-        const formData = new FormData();
-        formData.append('_method', 'PUT');
-        formData.append('name', data.name);
-        formData.append('description', data.description);
-        formData.append('price_min', data.price_min);
-        formData.append('price_max', data.price_max);
-        formData.append('location', data.location);
-        formData.append('contact_info', data.contact_info);
-        formData.append('operating_hours', data.operating_hours);
-
-        existingMediaIds.forEach((id) => {
-            formData.append('existing_media_ids[]', id.toString());
-        });
-
-        files.forEach((file) => {
-            formData.append('files[]', file);
-        });
-
-        router.post(`/manager/attractions/${attraction.id}`, formData, {
-            onError: (errors) => {
-                Object.keys(errors).forEach((key) => {
-                    setError(key as keyof typeof data, errors[key]);
-                });
-            },
+        setProcessing(true);
+        router.post(`/admin/culinaries/${culinary.id}`, fd, {
+            onError: (e) => setErrors(e),
+            onFinish: () => setProcessing(false),
         });
     };
 
     return (
-        <ManagerLayout title="Edit Wisata" village={village}>
+        <AdminLayout title="Edit Kuliner">
             <PageHeader
-                title="Edit Wisata / Atraksi"
+                title="Edit Kuliner"
                 breadcrumbs={[
-                    { label: 'Dashboard', href: '/manager' },
-                    { label: 'Wisata', href: '/manager/attractions' },
+                    { label: 'Dashboard', href: '/admin' },
+                    { label: 'Kuliner', href: '/admin/culinaries' },
                     { label: 'Edit' },
                 ]}
             />
+
             <form onSubmit={submit}>
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
                     <div className="space-y-5 lg:col-span-2">
                         <div className="space-y-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <Field label="Nama" required error={errors.name}>
+                            <Field
+                                label="Nama Kuliner"
+                                required
+                                error={errors.name}
+                            >
                                 <Input
-                                    value={data.name}
+                                    value={formData.name}
                                     onChange={(e) =>
-                                        setData('name', e.target.value)
+                                        set('name', e.target.value)
                                     }
                                     hasError={!!errors.name}
                                 />
                             </Field>
-                            <Field
-                                label="Deskripsi"
-                                required
-                                error={errors.description}
-                            >
+                            <Field label="Deskripsi" error={errors.description}>
                                 <RichEditor
-                                    content={data.description}
+                                    content={formData.description}
                                     onChange={(html) =>
-                                        setData('description', html)
+                                        set('description', html)
                                     }
                                     error={errors.description}
                                 />
                             </Field>
                             <div className="grid grid-cols-2 gap-4">
                                 <Field
-                                    label="Harga Min (Rp)"
+                                    label="Harga Minimum (Rp)"
                                     error={errors.price_min}
                                 >
                                     <Input
                                         type="number"
                                         min="0"
-                                        value={data.price_min}
+                                        value={formData.price_min}
                                         onChange={(e) =>
-                                            setData('price_min', e.target.value)
+                                            set('price_min', e.target.value)
                                         }
                                         hasError={!!errors.price_min}
+                                        placeholder="0"
                                     />
                                 </Field>
                                 <Field
-                                    label="Harga Maks (Rp)"
+                                    label="Harga Maksimum (Rp)"
                                     error={errors.price_max}
                                 >
                                     <Input
                                         type="number"
                                         min="0"
-                                        value={data.price_max}
+                                        value={formData.price_max}
                                         onChange={(e) =>
-                                            setData('price_max', e.target.value)
+                                            set('price_max', e.target.value)
                                         }
                                         hasError={!!errors.price_max}
+                                        placeholder="100000"
                                     />
                                 </Field>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <Field label="Lokasi" error={errors.location}>
                                     <Input
-                                        value={data.location}
+                                        value={formData.location}
                                         onChange={(e) =>
-                                            setData('location', e.target.value)
+                                            set('location', e.target.value)
                                         }
                                         hasError={!!errors.location}
                                     />
                                 </Field>
                                 <Field
-                                    label="Jam Operasional"
-                                    error={errors.operating_hours}
+                                    label="Info Kontak"
+                                    error={errors.contact_info}
                                 >
                                     <Input
-                                        value={data.operating_hours}
+                                        value={formData.contact_info}
                                         onChange={(e) =>
-                                            setData(
-                                                'operating_hours',
-                                                e.target.value,
-                                            )
+                                            set('contact_info', e.target.value)
                                         }
-                                        hasError={!!errors.operating_hours}
+                                        hasError={!!errors.contact_info}
                                     />
                                 </Field>
                             </div>
-                            <Field
-                                label="Info Kontak"
-                                error={errors.contact_info}
-                            >
-                                <Input
-                                    value={data.contact_info}
-                                    onChange={(e) =>
-                                        setData('contact_info', e.target.value)
-                                    }
-                                    hasError={!!errors.contact_info}
-                                />
-                            </Field>
                         </div>
+
+                        {/* Media */}
                         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                             <MediaInput
-                                label="Foto/Video Wisata / Atraksi"
-                                maxFiles={15}
-                                existingMedia={attraction.media}
-                                onChange={(
-                                    selectedFiles,
-                                    selectedExistingIds,
-                                ) => {
-                                    setFiles(selectedFiles);
-                                    setExistingMediaIds(selectedExistingIds);
+                                label="Foto/Video Kuliner"
+                                maxFiles={10}
+                                allowVideo
+                                existingMedia={culinary.media}
+                                onChange={(f, ids) => {
+                                    setFiles(f);
+                                    setExistingMediaIds(ids);
                                 }}
+                                error={errors['files.0']}
                             />
                         </div>
                     </div>
+
                     <div>
                         <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                            <p className="text-sm font-bold tracking-wide text-gray-500 uppercase">
-                                Simpan
+                            <p className="text-xs font-bold tracking-wide text-gray-500 uppercase">
+                                Informasi
                             </p>
+                            <div>
+                                <p className="text-xs tracking-wide text-gray-400 uppercase">
+                                    Desa
+                                </p>
+                                <p className="text-sm font-medium text-gray-700">
+                                    {culinary.village.name}
+                                </p>
+                            </div>
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="btn-primary w-full justify-center"
+                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
                             >
                                 <Save className="h-4 w-4" />
                                 {processing
@@ -253,6 +239,6 @@ export default function EditAttraction({ village, attraction }: Props) {
                     </div>
                 </div>
             </form>
-        </ManagerLayout>
+        </AdminLayout>
     );
 }
