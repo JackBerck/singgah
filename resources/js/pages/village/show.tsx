@@ -1,21 +1,19 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
 import {
     MapPin,
     Star,
     Calendar,
-    Phone,
     ChevronRight,
     Trees,
     Users,
     Clock,
     ExternalLink,
 } from 'lucide-react';
-
-import PublicLayout from '@/layouts/PublicLayout';
+import { useState } from 'react';
 import MediaGallery from '@/components/public/MediaGallery';
-import StarRating from '@/components/public/StarRating';
 import ReviewForm from '@/components/public/ReviewForm';
+import StarRating from '@/components/public/StarRating';
+import PublicLayout from '@/layouts/PublicLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -121,7 +119,6 @@ function SectionEmpty({ message }: { message: string }) {
 function ContentCard({
     item,
     href,
-    type,
 }: {
     item: ContentItem;
     href: string;
@@ -133,10 +130,10 @@ function ContentCard({
             ? cover.file_path
             : `/storage/${cover.file_path}`
         : null;
-    const rating = item.reviews_avg_rating || 0;
+    const rating = Number(item.reviews_avg_rating) || 0;
 
     return (
-        <Link href={href} className="content-card group block">
+        <Link href={href} className="content-card group block p-2 md:p-4">
             {/* Cover */}
             <div className="relative h-40 overflow-hidden rounded-xl bg-gray-100">
                 {coverSrc ? (
@@ -213,7 +210,7 @@ export default function VillageShow({
     );
 
     const isLoggedIn = !!auth?.user;
-    const avgRating = village.reviews_avg_rating || 0;
+    const avgRating = Number(village.reviews_avg_rating) || 0;
 
     const now = new Date();
     const upcomingEvents = village.events.filter(

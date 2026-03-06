@@ -14,20 +14,11 @@ import {
 } from 'lucide-react';
 
 import PublicLayout from '@/layouts/PublicLayout';
+import VillageCard, { VillageCardData } from '@/components/public/VillageCard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface Village {
-    id: number;
-    name: string;
-    slug: string;
-    short_description: string | null;
-    address: string | null;
-    is_featured: boolean;
-    cover_image: string | null;
-    reviews_count: number;
-    reviews_avg_rating: number;
-}
+type Village = VillageCardData;
 
 interface Stats {
     villages_count: number;
@@ -129,92 +120,6 @@ const regionColors: Record<string, string> = {
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
-function VillageCard({ village }: { village: Village }) {
-    const rating = village.reviews_avg_rating || 0;
-    const reviewCount = village.reviews_count || 0;
-
-    // Extract kota from address (e.g. "Desa X, Kec. Y, Kab. Z, Bali 80613" → "Bali")
-    const locationParts = village.address?.split(',') ?? [];
-    const location =
-        locationParts.length > 2
-            ? locationParts.slice(-2).join(',').trim()
-            : (village.address ?? '');
-
-    return (
-        <Link
-            href={`/desa/${village.slug}`}
-            className="village-card group block w-64 flex-shrink-0 sm:w-auto"
-        >
-            {/* Gambar */}
-            <div className="relative h-44 overflow-hidden bg-gray-100">
-                {village.cover_image ? (
-                    <img
-                        src={`/storage/${village.cover_image}`}
-                        alt={village.name}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                    />
-                ) : (
-                    <div
-                        className="flex h-full w-full items-center justify-center"
-                        style={{ background: 'var(--singgah-green-200)' }}
-                    >
-                        <Trees
-                            className="h-12 w-12 opacity-30"
-                            style={{ color: 'var(--singgah-green-700)' }}
-                        />
-                    </div>
-                )}
-                {village.is_featured && (
-                    <span
-                        className="absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold text-white"
-                        style={{ background: 'var(--singgah-earth-400)' }}
-                    >
-                        ⭐ Featured
-                    </span>
-                )}
-            </div>
-
-            {/* Konten */}
-            <div className="p-4">
-                <h3 className="line-clamp-1 font-semibold text-gray-900 transition-colors group-hover:text-[var(--singgah-green-700)]">
-                    {village.name}
-                </h3>
-                {location && (
-                    <div className="small-font-size mt-1.5 flex items-center gap-1 text-gray-500">
-                        <MapPin className="h-3.5 w-3.5 shrink-0" />
-                        <span className="line-clamp-1">{location}</span>
-                    </div>
-                )}
-                {village.short_description && (
-                    <p className="small-font-size mt-2 line-clamp-2 leading-relaxed text-gray-500">
-                        {village.short_description}
-                    </p>
-                )}
-                <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-                    <div className="flex items-center gap-1">
-                        <Star className="rating-star h-3.5 w-3.5 fill-current" />
-                        <span className="small-font-size font-semibold text-gray-800">
-                            {rating > 0 ? rating.toFixed(1) : '—'}
-                        </span>
-                        {reviewCount > 0 && (
-                            <span className="small-font-size text-gray-400">
-                                ({reviewCount})
-                            </span>
-                        )}
-                    </div>
-                    <span
-                        className="small-font-size flex items-center gap-0.5 font-medium transition-colors group-hover:text-[var(--singgah-green-600)]"
-                        style={{ color: 'var(--singgah-green-600)' }}
-                    >
-                        Lihat Detail <ChevronRight className="h-3.5 w-3.5" />
-                    </span>
-                </div>
-            </div>
-        </Link>
-    );
-}
 
 function SectionHeader({
     label,
@@ -360,7 +265,7 @@ export default function Home({
 
                 {/* Gradient Glow Blobs */}
                 <div
-                    className="absolute -right-24 -top-24 h-96 w-96 rounded-full opacity-20 blur-3xl"
+                    className="absolute -top-24 -right-24 h-96 w-96 rounded-full opacity-20 blur-3xl"
                     style={{ background: 'var(--singgah-teal-400)' }}
                     aria-hidden
                 />
@@ -370,7 +275,7 @@ export default function Home({
                     aria-hidden
                 />
 
-                <div className="section-padding-x relative z-10 w-full pb-16 pt-24 md:pb-20 md:pt-28">
+                <div className="section-padding-x relative z-10 w-full pt-24 pb-16 md:pt-28 md:pb-20">
                     <div className="container max-w-7xl">
                         <div className="max-w-3xl">
                             {/* Badge */}
@@ -387,7 +292,7 @@ export default function Home({
 
                             {/* Headline */}
                             <h1
-                                className="mb-5 font-extrabold leading-[1.12] text-white"
+                                className="mb-5 leading-[1.12] font-extrabold text-white"
                                 style={{
                                     fontFamily: 'var(--font-jakarta)',
                                     fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
@@ -462,7 +367,7 @@ export default function Home({
 
                 {/* Bottom Wave */}
                 <div
-                    className="absolute bottom-0 left-0 right-0 leading-none"
+                    className="absolute right-0 bottom-0 left-0 leading-none"
                     style={{ marginBottom: '-1px' }}
                 >
                     <svg
@@ -512,12 +417,10 @@ export default function Home({
                                     >
                                         <Icon className="h-6 w-6" />
                                     </span>
-                                    <span className="category-label small-font-size text-center font-semibold leading-tight text-gray-700 group-hover:text-gray-100">
+                                    <span className="category-label small-font-size text-center leading-tight font-semibold text-gray-700 group-hover:text-gray-100">
                                         {label}
                                     </span>
-                                    <span
-                                        className="small-font-size group-hover:text-gray-100 text-singgah-green-600"
-                                    >
+                                    <span className="small-font-size text-singgah-green-600 group-hover:text-gray-100">
                                         {count} desa
                                     </span>
                                 </Link>
@@ -545,7 +448,10 @@ export default function Home({
                             {/* Mobile: horizontal scroll */}
                             <div className="scrollbar-thin -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:hidden">
                                 {featuredVillages.map((v) => (
-                                    <div key={v.id} className="snap-start">
+                                    <div
+                                        key={v.id}
+                                        className="w-64 flex-shrink-0 snap-start"
+                                    >
                                         <VillageCard village={v} />
                                     </div>
                                 ))}
@@ -618,7 +524,7 @@ export default function Home({
                                     >
                                         {region.province}
                                     </p>
-                                    <h3 className="text-base font-bold leading-tight text-white transition-colors group-hover:text-[var(--singgah-teal-400)] md:text-lg">
+                                    <h3 className="text-base leading-tight font-bold text-white transition-colors group-hover:text-[var(--singgah-teal-400)] md:text-lg">
                                         {region.name}
                                     </h3>
                                     <p
@@ -633,7 +539,7 @@ export default function Home({
 
                                 {/* Hover Arrow */}
                                 <div
-                                    className="absolute right-3 top-3 flex h-7 w-7 scale-90 items-center justify-center rounded-full opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100"
+                                    className="absolute top-3 right-3 flex h-7 w-7 scale-90 items-center justify-center rounded-full opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100"
                                     style={{
                                         background: 'rgba(255,255,255,0.15)',
                                         backdropFilter: 'blur(4px)',
@@ -665,7 +571,10 @@ export default function Home({
                             {/* Mobile: horizontal scroll */}
                             <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:hidden">
                                 {newVillages.map((v) => (
-                                    <div key={v.id} className="snap-start">
+                                    <div
+                                        key={v.id}
+                                        className="w-64 flex-shrink-0 snap-start"
+                                    >
                                         <VillageCard village={v} />
                                     </div>
                                 ))}
@@ -760,7 +669,7 @@ export default function Home({
                     </svg>
                 </div>
 
-                <div className="container relative z-10 max-w-7xl">
+                <div className="relative z-10 container max-w-7xl">
                     <div className="mx-auto max-w-2xl text-center">
                         <span
                             className="small-font-size mb-4 inline-block rounded-full px-4 py-1.5 font-semibold"
@@ -773,7 +682,7 @@ export default function Home({
                             🏡 Untuk Pengelola Desa
                         </span>
                         <h2
-                            className="mb-4 font-extrabold leading-tight text-white"
+                            className="mb-4 leading-tight font-extrabold text-white"
                             style={{
                                 fontFamily: 'var(--font-jakarta)',
                                 fontSize: 'clamp(1.6rem, 3.5vw, 2.5rem)',

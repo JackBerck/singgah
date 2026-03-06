@@ -55,6 +55,13 @@ const fmtDate = (d: string) =>
         year: 'numeric',
     });
 
+const typeLabel: Record<string, string> = {
+    'App\\Models\\Village': '🏡 Desa',
+    'App\\Models\\Attraction': '🗺️ Wisata',
+    'App\\Models\\Culinary': '🍜 Kuliner',
+    'App\\Models\\Accommodation': '🏠 Akomodasi',
+};
+
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function Profil({ user }: Props) {
@@ -545,10 +552,14 @@ export default function Profil({ user }: Props) {
                                                                     'Konten Dihapus'}
                                                             </p>
                                                             <p className="mt-0.5 text-xs text-gray-500">
-                                                                {r.reviewable_type.replace(
-                                                                    'App\\Models\\',
-                                                                    '',
-                                                                )}{' '}
+                                                                {typeLabel[
+                                                                    r
+                                                                        .reviewable_type
+                                                                ] ??
+                                                                    r.reviewable_type.replace(
+                                                                        'App\\Models\\',
+                                                                        '',
+                                                                    )}{' '}
                                                                 ·{' '}
                                                                 {fmtDate(
                                                                     r.created_at,

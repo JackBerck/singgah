@@ -32,15 +32,22 @@ class ExploreController extends Controller
             $query->where('address', 'ilike', "%{$wilayah}%");
         }
 
+        // Apply rating filter before ordering
+        if ($ratingMin && is_numeric($ratingMin)) {
+            $minRating = (float) $ratingMin;
+            $query->whereHas('reviews', function ($q) {
+                $q->selectRaw('1');
+            })->whereRaw(
+                '(SELECT AVG(rating) FROM reviews WHERE reviews.reviewable_id = villages.id AND reviews.reviewable_type = ?) >= ?',
+                [Village::class, $minRating]
+            );
+        }
+
         match ($sort) {
             'rating'  => $query->orderByDesc('reviews_avg_rating'),
             'nama'    => $query->orderBy('name'),
             default   => $query->latest(),
         };
-
-        if ($ratingMin && is_numeric($ratingMin)) {
-            $query->having('reviews_avg_rating', '>=', (float) $ratingMin);
-        }
 
         $villages = $query->paginate(12)->withQueryString();
 

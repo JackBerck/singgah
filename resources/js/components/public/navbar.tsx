@@ -125,12 +125,9 @@ function UserDropdown({
 
                 {/* Profil */}
                 <DropdownMenuItem asChild>
-                    <Link
-                        href="/settings/profile"
-                        className="cursor-pointer rounded-xl"
-                    >
+                    <Link href="/profil" className="cursor-pointer rounded-xl">
                         <User className="h-4 w-4" />
-                        Profil
+                        Profil Saya
                     </Link>
                 </DropdownMenuItem>
 
@@ -362,12 +359,12 @@ export default function Navbar() {
                     {auth.user ? (
                         <div className="flex flex-col gap-2">
                             <Link
-                                href="/settings/profile"
+                                href="/profil"
                                 onClick={() => setMenuOpen(false)}
                                 className="flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                             >
                                 <User className="h-4 w-4 text-gray-400" />
-                                Profil
+                                Profil Saya
                             </Link>
                             {(auth.user.role === 'manager' ||
                                 auth.user.role === 'admin') && (

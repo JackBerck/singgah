@@ -9,12 +9,20 @@ import {
     Star,
     ArrowLeft,
     ArrowRight,
+    Check,
 } from 'lucide-react';
 
 import PublicLayout from '@/layouts/PublicLayout';
 import VillageCard, {
     type VillageCardData,
 } from '@/components/public/VillageCard';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -258,21 +266,57 @@ export default function Explore({ villages, filters }: Props) {
                 <h3 className="mb-2.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">
                     Wilayah
                 </h3>
-                <select
-                    value={wilayah}
-                    onChange={(e) => {
-                        setWilayah(e.target.value);
-                        applyFilters({ wilayah: e.target.value });
-                    }}
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[var(--singgah-green-400)]"
-                >
-                    <option value="">Semua Wilayah</option>
-                    {wilayahOptions.map((w) => (
-                        <option key={w} value={w}>
-                            {w}
-                        </option>
-                    ))}
-                </select>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="w-full justify-between rounded-xl border-gray-200 px-3 py-2 text-sm font-normal text-gray-900 hover:border-[var(--singgah-green-400)] hover:bg-white"
+                        >
+                            <span className="truncate">
+                                {wilayah || 'Semua Wilayah'}
+                            </span>
+                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        align="start"
+                        className="max-h-[300px] w-[--radix-dropdown-menu-trigger-width] overflow-y-auto"
+                    >
+                        <DropdownMenuItem
+                            onClick={() => {
+                                setWilayah('');
+                                applyFilters({ wilayah: '' });
+                            }}
+                            className="cursor-pointer"
+                        >
+                            <Check
+                                className={`mr-2 h-4 w-4 ${
+                                    wilayah === '' ? 'opacity-100' : 'opacity-0'
+                                }`}
+                            />
+                            Semua Wilayah
+                        </DropdownMenuItem>
+                        {wilayahOptions.map((w) => (
+                            <DropdownMenuItem
+                                key={w}
+                                onClick={() => {
+                                    setWilayah(w);
+                                    applyFilters({ wilayah: w });
+                                }}
+                                className="cursor-pointer"
+                            >
+                                <Check
+                                    className={`mr-2 h-4 w-4 ${
+                                        wilayah === w
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                    }`}
+                                />
+                                {w}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             {/* Rating minimum */}
