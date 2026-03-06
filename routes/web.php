@@ -139,4 +139,19 @@ Route::prefix('admin')
         Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
 
+// ─── Development: Error Testing Routes ───────────────────────────────────────
+// Uncomment these routes to test error pages in development
+// Remove or comment out in production
+
+if (app()->environment('local')) {
+    Route::prefix('test-error')->group(function () {
+        Route::get('/400', fn() => abort(400));
+        Route::get('/401', fn() => abort(401));
+        Route::get('/403', fn() => abort(403));
+        Route::get('/404', fn() => abort(404));
+        Route::get('/500', fn() => abort(500));
+        Route::get('/503', fn() => abort(503));
+    });
+}
+
 require __DIR__ . '/settings.php';
