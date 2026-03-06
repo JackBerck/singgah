@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Leaf, Instagram, Youtube, MapPin, Mail } from 'lucide-react';
+import AppLogoIcon from '../app-logo-icon';
 
 const footerColumns = [
     {
@@ -69,17 +70,7 @@ export default function Footer() {
                                 href="/"
                                 className="group mb-4 flex items-center gap-2"
                             >
-                                <span
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors group-hover:opacity-90"
-                                    style={{
-                                        background: 'var(--singgah-teal-500)',
-                                    }}
-                                >
-                                    <Leaf
-                                        className="h-5 w-5 text-white"
-                                        strokeWidth={2.5}
-                                    />
-                                </span>
+                                <AppLogoIcon className='w-9 aspect-auto'/>
                                 <span
                                     className="text-2xl font-bold text-white"
                                     style={{
