@@ -5,6 +5,7 @@ use App\Http\Controllers\StaticPageController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\VillageProfileController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\Public\ReviewController as PublicReviewController;
 use App\Http\Controllers\Auth\RegisteredManagerController;
 use App\Http\Controllers\Manager\AccommodationController;
@@ -40,6 +41,11 @@ Route::get('/desa/{slug}/accommodations/{id}', [VillageProfileController::class,
 Route::get('/register/pengelola', [RegisteredManagerController::class, 'create'])->name('register.manager');
 Route::post('/register/pengelola', [RegisteredManagerController::class, 'store'])->name('register.manager.store');
 Route::get('/register/pengelola/sukses', [RegisteredManagerController::class, 'success'])->name('register.manager.success');
+
+// AI Chat (accessible to all: guest & auth)
+Route::post('/ai/chat', [AiChatController::class, 'chat'])
+    ->middleware(['throttle:30,1'])
+    ->name('ai.chat');
 
 // Authenticated-only routes
 Route::middleware(['auth'])->group(function () {

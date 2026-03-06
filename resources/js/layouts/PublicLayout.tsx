@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import Footer from '@/components/public/footer';
 import Navbar from '@/components/public/navbar';
+import AiChatWidget from '@/components/public/AiChatWidget';
 
 interface PublicLayoutProps {
     children: ReactNode;
@@ -13,6 +14,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
+            <AiChatWidget />
         </div>
     );
 }

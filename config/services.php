@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'sumopod' => [
+        'key'   => env('SUMOPOD_API_KEY'),
+        'url'   => 'https://ai.sumopod.com/v1/chat/completions',
+        'model' => 'seed-2-0-mini',
+    ],
+
 ];
