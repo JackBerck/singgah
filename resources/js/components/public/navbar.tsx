@@ -184,7 +184,7 @@ export default function Navbar() {
 
     const navBg = scrolled
         ? 'bg-white/95 backdrop-blur-sm shadow-sm'
-        : 'bg-transparent';
+        : 'bg-singgah-green-600 backdrop-blur-sm';
     const textColor = scrolled ? 'text-gray-800' : 'text-white';
     const logoColor = scrolled
         ? 'text-[var(--singgah-green-700)]'

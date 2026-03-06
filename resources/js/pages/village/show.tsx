@@ -57,6 +57,8 @@ interface Village {
     slug: string;
     short_description: string | null;
     description: string | null;
+    category: string | null;
+    category_label: string | null;
     address: string | null;
     map_url: string | null;
     media: MediaItem[];
@@ -98,6 +100,14 @@ const tabs: { id: Tab; label: string }[] = [
     { id: 'akomodasi', label: '🏠 Akomodasi' },
     { id: 'ulasan', label: '⭐ Ulasan' },
 ];
+
+const categoryIcons: Record<string, string> = {
+    pesisir_bahari: '🌊',
+    agrowisata: '🌾',
+    kuliner_lokal: '🍴',
+    budaya_tradisi: '🎭',
+    wisata_alam: '🏞️',
+};
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -179,7 +189,7 @@ function ContentCard({
                             </span>
                         )}
                     </div>
-                    {(item.price_min || item.price_max) && (
+                    {(item.price_min || item.price_max) ? (
                         <span
                             className="text-xs font-medium"
                             style={{ color: 'var(--singgah-green-700)' }}
@@ -189,6 +199,8 @@ function ContentCard({
                                 ? ` – ${fmt(item.price_max)}`
                                 : ''}
                         </span>
+                    ) : (
+                        <span className="text-xs text-singgah-green-700 font-medium">—</span>
                     )}
                 </div>
             </div>
@@ -303,6 +315,26 @@ export default function VillageShow({
                                             ({village.reviews_count})
                                         </span>
                                     </div>
+
+                                    {/* Category Badge */}
+                                    {village.category &&
+                                        village.category_label && (
+                                            <div className="mt-3">
+                                                <Link
+                                                    href={`/explore?kategori=${village.category}`}
+                                                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-[var(--singgah-green-400)] hover:bg-[var(--singgah-green-50)]"
+                                                >
+                                                    <span>
+                                                        {categoryIcons[
+                                                            village.category
+                                                        ] || '🏞️'}
+                                                    </span>
+                                                    <span>
+                                                        {village.category_label}
+                                                    </span>
+                                                </Link>
+                                            </div>
+                                        )}
 
                                     {village.address && (
                                         <div className="mt-3 flex items-start gap-1.5 text-xs text-gray-500">
@@ -427,6 +459,27 @@ export default function VillageShow({
                                                 ({village.reviews_count} ulasan)
                                             </span>
                                         </div>
+                                        {/* Category Badge Mobile */}
+                                        {village.category &&
+                                            village.category_label && (
+                                                <div className="mt-2">
+                                                    <Link
+                                                        href={`/explore?kategori=${village.category}`}
+                                                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-[var(--singgah-green-400)] hover:bg-[var(--singgah-green-50)]"
+                                                    >
+                                                        <span>
+                                                            {categoryIcons[
+                                                                village.category
+                                                            ] || '🏞️'}
+                                                        </span>
+                                                        <span>
+                                                            {
+                                                                village.category_label
+                                                            }
+                                                        </span>
+                                                    </Link>
+                                                </div>
+                                            )}
                                     </div>
 
                                     {/* Galeri */}

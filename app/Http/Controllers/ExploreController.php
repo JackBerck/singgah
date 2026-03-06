@@ -12,6 +12,7 @@ class ExploreController extends Controller
     {
         $search    = $request->input('search', '');
         $wilayah   = $request->input('wilayah', '');
+        $kategori  = $request->input('kategori', '');
         $sort      = $request->input('sort', 'terbaru');
         $ratingMin = $request->input('rating_min', '');
 
@@ -30,6 +31,10 @@ class ExploreController extends Controller
 
         if ($wilayah) {
             $query->where('address', 'ilike', "%{$wilayah}%");
+        }
+
+        if ($kategori) {
+            $query->where('category', $kategori);
         }
 
         // Apply rating filter before ordering
@@ -64,6 +69,7 @@ class ExploreController extends Controller
             'filters'  => [
                 'search'     => $search,
                 'wilayah'    => $wilayah,
+                'kategori'   => $kategori,
                 'sort'       => $sort,
                 'rating_min' => $ratingMin,
             ],

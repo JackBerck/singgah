@@ -54,6 +54,7 @@ interface Villages {
 interface Filters {
     search: string;
     wilayah: string;
+    kategori: string;
     sort: string;
     rating_min: string;
 }
@@ -79,6 +80,14 @@ const wilayahOptions = [
     'Nusa Tenggara Barat',
     'Kalimantan Timur',
     'Papua',
+];
+
+const categoryOptions = [
+    { value: 'pesisir_bahari', label: 'Pesisir & Bahari' },
+    { value: 'agrowisata', label: 'Agrowisata' },
+    { value: 'kuliner_lokal', label: 'Kuliner Lokal' },
+    { value: 'budaya_tradisi', label: 'Budaya & Tradisi' },
+    { value: 'wisata_alam', label: 'Wisata Alam' },
 ];
 
 const sortOptions = [
@@ -177,6 +186,7 @@ function SmartPagination({
 export default function Explore({ villages, filters }: Props) {
     const [search, setSearch] = useState(filters.search);
     const [wilayah, setWilayah] = useState(filters.wilayah);
+    const [kategori, setKategori] = useState(filters.kategori);
     const [sort, setSort] = useState(filters.sort || 'terbaru');
     const [ratingMin, setRatingMin] = useState(filters.rating_min);
     const [showMobileFilter, setShowMobileFilter] = useState(false);
@@ -192,6 +202,7 @@ export default function Explore({ villages, filters }: Props) {
             {
                 search,
                 wilayah,
+                kategori,
                 sort,
                 rating_min: ratingMin,
                 ...overrides,
@@ -205,12 +216,14 @@ export default function Explore({ villages, filters }: Props) {
         const next = {
             search,
             wilayah,
+            kategori,
             sort,
             rating_min: ratingMin,
             [key]: '',
         };
         if (key === 'search') setSearch('');
         if (key === 'wilayah') setWilayah('');
+        if (key === 'kategori') setKategori('');
         if (key === 'rating_min') setRatingMin('');
         applyFilters(next);
     };
@@ -218,11 +231,13 @@ export default function Explore({ villages, filters }: Props) {
     const activeFilterCount = [
         filters.search,
         filters.wilayah,
+        filters.kategori,
         filters.rating_min,
     ].filter(Boolean).length;
     const currentFilters: Filters = {
         search,
         wilayah,
+        kategori,
         sort,
         rating_min: ratingMin,
     };
@@ -313,6 +328,70 @@ export default function Explore({ villages, filters }: Props) {
                                     }`}
                                 />
                                 {w}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+
+            {/* Kategori */}
+            <div>
+                <h3 className="mb-2.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+                    Kategori
+                </h3>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="w-full justify-between rounded-xl border-gray-200 px-3 py-2 text-sm font-normal text-gray-900 hover:border-[var(--singgah-green-400)] hover:bg-white"
+                        >
+                            <span className="truncate">
+                                {kategori
+                                    ? categoryOptions.find(
+                                          (c) => c.value === kategori,
+                                      )?.label
+                                    : 'Semua Kategori'}
+                            </span>
+                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        align="start"
+                        className="max-h-[300px] w-[--radix-dropdown-menu-trigger-width] overflow-y-auto"
+                    >
+                        <DropdownMenuItem
+                            onClick={() => {
+                                setKategori('');
+                                applyFilters({ kategori: '' });
+                            }}
+                            className="cursor-pointer"
+                        >
+                            <Check
+                                className={`mr-2 h-4 w-4 ${
+                                    kategori === ''
+                                        ? 'opacity-100'
+                                        : 'opacity-0'
+                                }`}
+                            />
+                            Semua Kategori
+                        </DropdownMenuItem>
+                        {categoryOptions.map((cat) => (
+                            <DropdownMenuItem
+                                key={cat.value}
+                                onClick={() => {
+                                    setKategori(cat.value);
+                                    applyFilters({ kategori: cat.value });
+                                }}
+                                className="cursor-pointer"
+                            >
+                                <Check
+                                    className={`mr-2 h-4 w-4 ${
+                                        kategori === cat.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                    }`}
+                                />
+                                {cat.label}
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>

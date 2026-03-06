@@ -14,11 +14,17 @@ const footerColumns = [
     {
         title: 'Kategori',
         links: [
-            { label: 'Wisata Alam', href: '/explore?kategori=alam' },
-            { label: 'Budaya & Tradisi', href: '/explore?kategori=budaya' },
-            { label: 'Kuliner Lokal', href: '/explore?kategori=kuliner' },
+            { label: 'Wisata Alam', href: '/explore?kategori=wisata_alam' },
+            {
+                label: 'Budaya & Tradisi',
+                href: '/explore?kategori=budaya_tradisi',
+            },
+            { label: 'Kuliner Lokal', href: '/explore?kategori=kuliner_lokal' },
             { label: 'Agrowisata', href: '/explore?kategori=agrowisata' },
-            { label: 'Pesisir & Bahari', href: '/explore?kategori=pesisir' },
+            {
+                label: 'Pesisir & Bahari',
+                href: '/explore?kategori=pesisir_bahari',
+            },
         ],
     },
     {
@@ -166,7 +172,7 @@ export default function Footer() {
                         </div>
 
                         {/* Link Columns */}
-                        <div className="flex justify-between gap-10 sm:gap-12 flex-col sm:flex-row">
+                        <div className="flex flex-col justify-between gap-10 sm:flex-row sm:gap-12">
                             {footerColumns.map((col) => (
                                 <div key={col.title}>
                                     <h4

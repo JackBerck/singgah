@@ -19,6 +19,7 @@ class Village extends Model
         'slug',
         'short_description',
         'description',
+        'category',
         'address',
         'latitude',
         'longitude',
@@ -26,6 +27,10 @@ class Village extends Model
         'status',
         'is_featured',
         'rejected_reason',
+    ];
+
+    protected $appends = [
+        'category_label',
     ];
 
     protected function casts(): array
@@ -84,5 +89,23 @@ class Village extends Model
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+    public static function categories(): array
+    {
+        return [
+            'pesisir_bahari' => 'Pesisir & Bahari',
+            'agrowisata' => 'Agrowisata',
+            'kuliner_lokal' => 'Kuliner Lokal',
+            'budaya_tradisi' => 'Budaya & Tradisi',
+            'wisata_alam' => 'Wisata Alam',
+        ];
+    }
+
+    public function getCategoryLabelAttribute(): ?string
+    {
+        return self::categories()[$this->category] ?? null;
     }
 }

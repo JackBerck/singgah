@@ -2,14 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Accommodation;
-use App\Models\Attraction;
-use App\Models\Culinary;
-use App\Models\Media;
-use App\Models\Review;
 use App\Models\User;
 use App\Models\Village;
-use App\Models\VillageEvent;
 use Illuminate\Database\Seeder;
 
 class VillageSeeder extends Seeder
@@ -28,6 +22,7 @@ class VillageSeeder extends Seeder
             'status'            => 'verified',
             'is_featured'       => true,
             'manager_email'     => 'manager.penglipuran@singgah.id',
+            'category'          => 'budaya_tradisi',
         ],
         [
             'name'              => 'Desa Sade',
@@ -41,6 +36,7 @@ class VillageSeeder extends Seeder
             'status'            => 'verified',
             'is_featured'       => true,
             'manager_email'     => 'manager.sade@singgah.id',
+            'category'          => 'budaya_tradisi',
         ],
         [
             'name'              => 'Desa Wae Rebo',
@@ -54,6 +50,7 @@ class VillageSeeder extends Seeder
             'status'            => 'verified',
             'is_featured'       => false,
             'manager_email'     => 'manager.waerebo@singgah.id',
+            'category'          => 'budaya_tradisi',
         ],
         [
             'name'              => 'Desa Wisata Dieng Kulon',
@@ -67,6 +64,7 @@ class VillageSeeder extends Seeder
             'status'            => 'verified',
             'is_featured'       => true,
             'manager_email'     => 'manager.dieng@singgah.id',
+            'category'          => 'budaya_tradisi',
         ],
         [
             'name'              => 'Desa Trunyan',
@@ -80,6 +78,7 @@ class VillageSeeder extends Seeder
             'status'            => 'verified',
             'is_featured'       => false,
             'manager_email'     => 'manager.trunyan@singgah.id',
+            'category'          => 'budaya_tradisi',
         ],
         [
             'name'              => 'Desa Wisata Kemiren',
@@ -93,6 +92,7 @@ class VillageSeeder extends Seeder
             'status'            => 'pending',
             'is_featured'       => false,
             'manager_email'     => 'manager.kemiren@singgah.id',
+            'category'          => 'budaya_tradisi',
         ],
     ];
 
@@ -115,6 +115,7 @@ class VillageSeeder extends Seeder
                 'map_url'           => $data['map_url'],
                 'status'            => $data['status'],
                 'is_featured'       => $data['is_featured'],
+                'category'          => $data['category'],
             ]);
 
             // Seed media untuk village (3 gambar dummy)

@@ -20,6 +20,7 @@ class UpdateVillageRequest extends FormRequest
             'slug'              => ['nullable', 'string', 'max:255', "unique:villages,slug,{$villageId}"],
             'short_description' => ['nullable', 'string', 'max:500'],
             'description'       => ['nullable', 'string'],
+            'category'          => ['nullable', 'in:pesisir_bahari,agrowisata,kuliner_lokal,budaya_tradisi,wisata_alam'],
             'address'           => ['nullable', 'string', 'max:500'],
             'latitude'          => ['nullable', 'numeric', 'between:-90,90'],
             'longitude'         => ['nullable', 'numeric', 'between:-180,180'],

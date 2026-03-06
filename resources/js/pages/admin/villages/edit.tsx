@@ -25,6 +25,7 @@ interface Village {
     slug: string;
     short_description: string | null;
     description: string | null;
+    category: string | null;
     address: string | null;
     latitude: number | null;
     longitude: number | null;
@@ -79,6 +80,15 @@ const statusOptions = [
     { value: 'rejected', label: 'Ditolak' },
 ];
 
+const categoryOptions = [
+    { value: '', label: 'Belum Dipilih' },
+    { value: 'pesisir_bahari', label: 'Pesisir & Bahari' },
+    { value: 'agrowisata', label: 'Agrowisata' },
+    { value: 'kuliner_lokal', label: 'Kuliner Lokal' },
+    { value: 'budaya_tradisi', label: 'Budaya & Tradisi' },
+    { value: 'wisata_alam', label: 'Wisata Alam' },
+];
+
 export default function VillageEdit({ village }: Props) {
     const [statusOpen, setStatusOpen] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
@@ -93,6 +103,7 @@ export default function VillageEdit({ village }: Props) {
         slug: village.slug,
         short_description: village.short_description ?? '',
         description: village.description ?? '',
+        category: village.category ?? '',
         address: village.address ?? '',
         latitude: String(village.latitude ?? ''),
         longitude: String(village.longitude ?? ''),
@@ -194,6 +205,33 @@ export default function VillageEdit({ village }: Props) {
                                     error={errors.description}
                                 />
                             </Field>
+
+                            <Field
+                                label="Kategori Desa"
+                                error={errors.category}
+                            >
+                                <select
+                                    value={formData.category}
+                                    onChange={(e) =>
+                                        set('category', e.target.value)
+                                    }
+                                    className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                                >
+                                    {categoryOptions.map((opt) => (
+                                        <option
+                                            key={opt.value}
+                                            value={opt.value}
+                                        >
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <p className="mt-1 text-xs text-gray-500">
+                                    Pilih kategori yang paling sesuai dengan
+                                    keunggulan desa
+                                </p>
+                            </Field>
+
                             <Field label="Alamat" error={errors.address}>
                                 <Input
                                     value={formData.address}

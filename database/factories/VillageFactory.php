@@ -32,6 +32,7 @@ class VillageFactory extends Factory
             'slug'              => Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 999),
             'short_description' => fake()->sentence(12),
             'description'       => fake()->paragraphs(4, true),
+            'category'          => fake()->randomElement(['pesisir_bahari', 'agrowisata', 'kuliner_lokal', 'budaya_tradisi', 'wisata_alam']),
             'address'           => fake()->address(),
             'latitude'          => fake()->latitude(-8.5, -7.0),
             'longitude'         => fake()->longitude(108.0, 115.5),
