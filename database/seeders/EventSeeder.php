@@ -113,7 +113,7 @@ class EventSeeder extends Seeder
 
                 // 1 banner image per event
                 $event->media()->create([
-                    'file_path' => "images/events/{$event->id}/banner.jpg",
+                    'file_path' => "events/{$event->id}/banner.jpg",
                     'disk'      => 'public',
                     'type'      => 'image',
                     'alt_text'  => "Banner - {$event->name}",

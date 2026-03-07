@@ -106,6 +106,7 @@ export default function EditAccommodation({ village, accommodation }: Props) {
         });
 
         router.post(`/manager/accommodations/${accommodation.id}`, formData, {
+            forceFormData: true,
             onError: (errors) => {
                 Object.keys(errors).forEach((key) => {
                     setError(key as keyof typeof data, errors[key]);

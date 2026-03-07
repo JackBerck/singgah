@@ -99,6 +99,7 @@ export default function AdminEditAccommodation({ accommodation }: Props) {
 
         setProcessing(true);
         router.post(`/admin/accommodations/${accommodation.id}`, fd, {
+            forceFormData: true,
             onError: (e) => setErrors(e),
             onFinish: () => setProcessing(false),
         });

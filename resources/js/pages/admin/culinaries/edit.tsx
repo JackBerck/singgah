@@ -97,6 +97,7 @@ export default function AdminEditCulinary({ culinary }: Props) {
 
         setProcessing(true);
         router.post(`/admin/culinaries/${culinary.id}`, fd, {
+            forceFormData: true,
             onError: (e) => setErrors(e),
             onFinish: () => setProcessing(false),
         });

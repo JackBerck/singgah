@@ -46,7 +46,10 @@ function MediaPreview({
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const pathname = window.location.pathname;
-    const src = pathname.includes("edit") ? `/storage/${item.file_path}` : `${item.file_path}`;
+    const cleanPath = item.file_path.replace(/^.*storage\//, '');
+    const src = pathname.includes('edit')
+        ? `/storage/${cleanPath}`
+        : item.file_path;
 
     const handleConfirmDelete = async () => {
         setDeleting(true);

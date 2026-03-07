@@ -132,7 +132,7 @@ class EntitySeeder extends Seeder
                 // Media: 2 gambar per attraction
                 for ($i = 1; $i <= 2; $i++) {
                     $attraction->media()->create([
-                        'file_path' => "images/attractions/{$attraction->id}/photo-{$i}.jpg",
+                        'file_path' => "attractions/{$attraction->id}/photo-{$i}.jpg",
                         'disk'      => 'public',
                         'type'      => 'image',
                         'alt_text'  => "Foto {$i} - {$attraction->name}",
@@ -180,7 +180,7 @@ class EntitySeeder extends Seeder
                 // Media: 2 gambar per culinary
                 for ($i = 1; $i <= 2; $i++) {
                     $culinary->media()->create([
-                        'file_path' => "images/culinaries/{$culinary->id}/photo-{$i}.jpg",
+                        'file_path' => "culinaries/{$culinary->id}/photo-{$i}.jpg",
                         'disk'      => 'public',
                         'type'      => 'image',
                         'alt_text'  => "Foto {$i} - {$culinary->name}",
@@ -225,10 +225,10 @@ class EntitySeeder extends Seeder
                     'operating_hours' => $data['hours'],
                 ]);
 
-                // Media: 3 gambar per accommodation
-                for ($i = 1; $i <= 3; $i++) {
+                // Media: 1 gambar per accommodation
+                for ($i = 1; $i <= 1; $i++) {
                     $accommodation->media()->create([
-                        'file_path' => "images/accommodations/{$accommodation->id}/photo-{$i}.jpg",
+                        'file_path' => "accommodations/{$accommodation->id}/photo-{$i}.jpg",
                         'disk'      => 'public',
                         'type'      => 'image',
                         'alt_text'  => "Foto {$i} - {$accommodation->name}",

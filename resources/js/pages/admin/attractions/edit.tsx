@@ -99,6 +99,7 @@ export default function AdminEditAttraction({ attraction }: Props) {
 
         setProcessing(true);
         router.post(`/admin/attractions/${attraction.id}`, fd, {
+            forceFormData: true,
             onError: (e) => setErrors(e),
             onFinish: () => setProcessing(false),
         });

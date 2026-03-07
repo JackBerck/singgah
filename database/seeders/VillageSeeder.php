@@ -119,9 +119,9 @@ class VillageSeeder extends Seeder
             ]);
 
             // Seed media untuk village (3 gambar dummy)
-            for ($i = 1; $i <= 3; $i++) {
+            for ($i = 1; $i <= 1; $i++) {
                 $village->media()->create([
-                    'file_path' => "images/villages/{$village->slug}/photo-{$i}.jpg",
+                    'file_path' => "villages/{$village->slug}/photo-{$i}.jpg",
                     'disk'      => 'public',
                     'type'      => 'image',
                     'alt_text'  => "Foto {$i} - {$village->name}",

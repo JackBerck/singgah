@@ -103,6 +103,7 @@ export default function EditCulinary({ village, culinary }: Props) {
         });
 
         router.post(`/manager/culinaries/${culinary.id}`, formData, {
+            forceFormData: true,
             onError: (errors) => {
                 Object.keys(errors).forEach((key) => {
                     setError(key as keyof typeof data, errors[key]);

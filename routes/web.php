@@ -101,8 +101,11 @@ Route::prefix('admin')
 
         // Villages
         Route::get('/villages', [\App\Http\Controllers\Admin\VillageController::class, 'index'])->name('villages.index');
+        Route::get('/villages/{village}', function ($village) {
+            return redirect()->route('admin.villages.edit', $village);
+        });
         Route::get('/villages/{village}/edit', [\App\Http\Controllers\Admin\VillageController::class, 'edit'])->name('villages.edit');
-        Route::post('/villages/{village}', [\App\Http\Controllers\Admin\VillageController::class, 'update'])->name('villages.update');
+        Route::match(['post', 'put'], '/villages/{village}', [\App\Http\Controllers\Admin\VillageController::class, 'update'])->name('villages.update');
         Route::delete('/villages/{village}', [\App\Http\Controllers\Admin\VillageController::class, 'destroy'])->name('villages.destroy');
         Route::patch('/villages/{village}/verify', [\App\Http\Controllers\Admin\VillageController::class, 'verify'])->name('villages.verify');
         Route::patch('/villages/{village}/reject', [\App\Http\Controllers\Admin\VillageController::class, 'reject'])->name('villages.reject');
@@ -114,29 +117,41 @@ Route::prefix('admin')
 
         // Events
         Route::get('/events', [\App\Http\Controllers\Admin\EventController::class, 'index'])->name('events.index');
+        Route::get('/events/{event}', function ($event) {
+            return redirect()->route('admin.events.edit', $event);
+        });
         Route::get('/events/{event}/edit', [\App\Http\Controllers\Admin\EventController::class, 'edit'])->name('events.edit');
-        Route::post('/events/{event}', [\App\Http\Controllers\Admin\EventController::class, 'update'])->name('events.update');
+        Route::match(['post', 'put'], '/events/{event}', [\App\Http\Controllers\Admin\EventController::class, 'update'])->name('events.update');
         Route::delete('/events/{event}', [\App\Http\Controllers\Admin\EventController::class, 'destroy'])->name('events.destroy');
         Route::post('/events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])->name('events.media.store');
 
         // Attractions
         Route::get('/attractions', [\App\Http\Controllers\Admin\AttractionController::class, 'index'])->name('attractions.index');
+        Route::get('/attractions/{attraction}', function ($attraction) {
+            return redirect()->route('admin.attractions.edit', $attraction);
+        });
         Route::get('/attractions/{attraction}/edit', [\App\Http\Controllers\Admin\AttractionController::class, 'edit'])->name('attractions.edit');
-        Route::post('/attractions/{attraction}', [\App\Http\Controllers\Admin\AttractionController::class, 'update'])->name('attractions.update');
+        Route::match(['post', 'put'], '/attractions/{attraction}', [\App\Http\Controllers\Admin\AttractionController::class, 'update'])->name('attractions.update');
         Route::delete('/attractions/{attraction}', [\App\Http\Controllers\Admin\AttractionController::class, 'destroy'])->name('attractions.destroy');
         Route::post('/attractions/{attraction}/media', [\App\Http\Controllers\Admin\AttractionMediaController::class, 'store'])->name('attractions.media.store');
 
         // Culinaries
         Route::get('/culinaries', [\App\Http\Controllers\Admin\CulinaryController::class, 'index'])->name('culinaries.index');
+        Route::get('/culinaries/{culinary}', function ($culinary) {
+            return redirect()->route('admin.culinaries.edit', $culinary);
+        });
         Route::get('/culinaries/{culinary}/edit', [\App\Http\Controllers\Admin\CulinaryController::class, 'edit'])->name('culinaries.edit');
-        Route::post('/culinaries/{culinary}', [\App\Http\Controllers\Admin\CulinaryController::class, 'update'])->name('culinaries.update');
+        Route::match(['post', 'put'], '/culinaries/{culinary}', [\App\Http\Controllers\Admin\CulinaryController::class, 'update'])->name('culinaries.update');
         Route::delete('/culinaries/{culinary}', [\App\Http\Controllers\Admin\CulinaryController::class, 'destroy'])->name('culinaries.destroy');
         Route::post('/culinaries/{culinary}/media', [\App\Http\Controllers\Admin\CulinaryMediaController::class, 'store'])->name('culinaries.media.store');
 
         // Accommodations
         Route::get('/accommodations', [\App\Http\Controllers\Admin\AccommodationController::class, 'index'])->name('accommodations.index');
+        Route::get('/accommodations/{accommodation}', function ($accommodation) {
+            return redirect()->route('admin.accommodations.edit', $accommodation);
+        });
         Route::get('/accommodations/{accommodation}/edit', [\App\Http\Controllers\Admin\AccommodationController::class, 'edit'])->name('accommodations.edit');
-        Route::post('/accommodations/{accommodation}', [\App\Http\Controllers\Admin\AccommodationController::class, 'update'])->name('accommodations.update');
+        Route::match(['post', 'put'], '/accommodations/{accommodation}', [\App\Http\Controllers\Admin\AccommodationController::class, 'update'])->name('accommodations.update');
         Route::delete('/accommodations/{accommodation}', [\App\Http\Controllers\Admin\AccommodationController::class, 'destroy'])->name('accommodations.destroy');
         Route::post('/accommodations/{accommodation}/media', [\App\Http\Controllers\Admin\AccommodationMediaController::class, 'store'])->name('accommodations.media.store');
 

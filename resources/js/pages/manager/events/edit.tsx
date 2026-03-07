@@ -118,6 +118,7 @@ export default function EditEvent({ village, event }: Props) {
         });
 
         router.post(`/manager/events/${event.id}`, formData, {
+            forceFormData: true,
             onError: (errors) => {
                 Object.keys(errors).forEach((key) => {
                     setError(key as keyof typeof data, errors[key]);

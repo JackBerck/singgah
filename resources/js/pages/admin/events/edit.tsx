@@ -116,6 +116,7 @@ export default function AdminEditEvent({ event, village }: Props) {
 
         setProcessing(true);
         router.post(`/admin/events/${event.id}`, fd, {
+            forceFormData: true,
             onError: (e) => setErrors(e),
             onFinish: () => setProcessing(false),
         });

@@ -129,6 +129,7 @@ export default function VillageEdit({ village }: Props) {
 
         setProcessing(true);
         router.post(`/admin/villages/${village.id}`, fd, {
+            forceFormData: true,
             onError: (e) => setErrors(e),
             onFinish: () => setProcessing(false),
         });
