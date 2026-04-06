@@ -4,6 +4,8 @@ import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
 import StarRating from '@/components/public/StarRating';
 import ReviewForm from '@/components/public/ReviewForm';
+import BookmarkButton from '@/components/public/BookmarkButton';
+import ShareButton from '@/components/public/ShareButton';
 
 interface MediaItem {
     id: number;
@@ -37,6 +39,7 @@ interface Props {
     village: { id: number; name: string; slug: string };
     culinary: Culinary;
     userReview: { id: number; rating: number; comment: string | null } | null;
+    isWishlisted?: boolean;
 }
 
 const fmt = (n: number | null) =>
@@ -52,6 +55,7 @@ export default function CulinaryDetail({
     village,
     culinary,
     userReview,
+    isWishlisted = false,
 }: Props) {
     const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
     const isLoggedIn = !!auth?.user;
@@ -92,24 +96,25 @@ export default function CulinaryDetail({
                     <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
                         {/* Left */}
                         <div className="space-y-8">
-                            <div>
-                                <span
-                                    className="mb-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white"
-                                    style={{
-                                        background: 'var(--singgah-earth-400)',
-                                    }}
-                                >
-                                    🍜 Kuliner & UMKM
-                                </span>
-                                <h1
-                                    className="mb-2 text-2xl font-bold text-gray-900"
-                                    style={{
-                                        fontFamily: 'var(--font-jakarta)',
-                                    }}
-                                >
-                                    {culinary.name}
-                                </h1>
-                                <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <span
+                                        className="mb-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white"
+                                        style={{
+                                            background: 'var(--singgah-earth-400)',
+                                        }}
+                                    >
+                                        🍜 Kuliner & UMKM
+                                    </span>
+                                    <h1
+                                        className="mb-2 text-2xl font-bold text-gray-900"
+                                        style={{
+                                            fontFamily: 'var(--font-jakarta)',
+                                        }}
+                                    >
+                                        {culinary.name}
+                                    </h1>
+                                    <div className="flex flex-wrap items-center gap-3">
                                     <div className="flex items-center gap-1.5">
                                         <StarRating
                                             value={Math.round(avg)}
@@ -131,6 +136,19 @@ export default function CulinaryDetail({
                                             {culinary.location}
                                         </div>
                                     )}
+                                    </div>
+                                </div>
+                                <div className="flex shrink-0 gap-1 mt-6 -mr-2">
+                                    <ShareButton
+                                        url={typeof window !== 'undefined' ? window.location.href : ''}
+                                        title={`${culinary.name} - Singgah`}
+                                    />
+                                    <BookmarkButton
+                                        type="culinary"
+                                        id={culinary.id}
+                                        initialWishlisted={isWishlisted}
+                                        isLoggedIn={isLoggedIn}
+                                    />
                                 </div>
                             </div>
 
@@ -220,7 +238,7 @@ export default function CulinaryDetail({
                                 {(culinary.price_min || culinary.price_max) && (
                                     <div className="mb-3 flex items-start gap-3">
                                         <IndianRupee
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
+                                            className="mt-0.5 h-4 w-4 shrink-0"
                                             style={{
                                                 color: 'var(--singgah-green-600)',
                                             }}
@@ -243,7 +261,7 @@ export default function CulinaryDetail({
                                 {culinary.contact_info && (
                                     <div className="flex items-start gap-3">
                                         <Phone
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
+                                            className="mt-0.5 h-4 w-4 shrink-0"
                                             style={{
                                                 color: 'var(--singgah-green-600)',
                                             }}

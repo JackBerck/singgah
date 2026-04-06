@@ -13,6 +13,8 @@ import { useState } from 'react';
 import MediaGallery from '@/components/public/MediaGallery';
 import ReviewForm from '@/components/public/ReviewForm';
 import StarRating from '@/components/public/StarRating';
+import BookmarkButton from '@/components/public/BookmarkButton';
+import ShareButton from '@/components/public/ShareButton';
 import PublicLayout from '@/layouts/PublicLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -77,6 +79,7 @@ interface Props {
     village: Village;
     userReview: { id: number; rating: number; comment: string | null } | null;
     ratingBreakdown: Record<string, number>;
+    isWishlisted: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -168,7 +171,7 @@ function ContentCard({
 
             {/* Body */}
             <div className="pt-3">
-                <h3 className="leading-tight font-semibold text-gray-900 transition-colors group-hover:text-[var(--singgah-green-700)]">
+                <h3 className="leading-tight font-semibold text-gray-900 transition-colors group-hover:text-(--singgah-green-700)">
                     {item.name}
                 </h3>
                 {item.location && (
@@ -214,6 +217,7 @@ export default function VillageShow({
     village,
     userReview,
     ratingBreakdown,
+    isWishlisted,
 }: Props) {
     const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
     const [activeTab, setActiveTab] = useState<Tab>('beranda');
@@ -258,10 +262,10 @@ export default function VillageShow({
                 <div className="container max-w-7xl">
                     <div className="flex gap-8 lg:items-start">
                         {/* ── Sticky Sidebar ── */}
-                        <aside className="village-detail-sidebar hidden w-64 flex-shrink-0 lg:block">
+                        <aside className="village-detail-sidebar hidden w-64 shrink-0 lg:block">
                             <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
                                 {/* Cover */}
-                                <div className="aspect-[16/9] overflow-hidden bg-gray-100">
+                                <div className="aspect-video overflow-hidden bg-gray-100">
                                     {village.media[0] ? (
                                         <img
                                             src={
@@ -293,14 +297,29 @@ export default function VillageShow({
                                 </div>
 
                                 <div className="p-4">
-                                    <h1
-                                        className="leading-tight font-bold text-gray-900"
-                                        style={{
-                                            fontFamily: 'var(--font-jakarta)',
-                                        }}
-                                    >
-                                        {village.name}
-                                    </h1>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <h1
+                                            className="leading-tight font-bold text-gray-900"
+                                            style={{
+                                                fontFamily: 'var(--font-jakarta)',
+                                            }}
+                                        >
+                                            {village.name}
+                                        </h1>
+                                        <div className="flex shrink-0 -mt-1 -mr-1">
+                                            <ShareButton
+                                                url={typeof window !== 'undefined' ? window.location.href : ''}
+                                                title={`${village.name} - Singgah`}
+                                                description={village.short_description || `Jelajahi ${village.name} di Singgah.`}
+                                            />
+                                            <BookmarkButton
+                                                type="village"
+                                                id={village.id}
+                                                initialWishlisted={isWishlisted}
+                                                isLoggedIn={isLoggedIn}
+                                            />
+                                        </div>
+                                    </div>
 
                                     {/* Rating */}
                                     <div className="mt-2 flex items-center gap-2">
@@ -322,7 +341,7 @@ export default function VillageShow({
                                             <div className="mt-3">
                                                 <Link
                                                     href={`/explore?kategori=${village.category}`}
-                                                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-[var(--singgah-green-400)] hover:bg-[var(--singgah-green-50)]"
+                                                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-(--singgah-green-400) hover:bg-(--singgah-green-50)"
                                                 >
                                                     <span>
                                                         {categoryIcons[
@@ -414,7 +433,7 @@ export default function VillageShow({
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                                        className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                                             activeTab === tab.id
                                                 ? 'text-white'
                                                 : 'border border-gray-200 text-gray-600'
@@ -437,9 +456,24 @@ export default function VillageShow({
                             {activeTab === 'beranda' && (
                                 <div className="space-y-8">
                                     {/* Header mobile */}
-                                    <div className="lg:hidden">
+                                    <div className="lg:hidden relative">
+                                        <div className="absolute right-0 top-0 flex items-center">
+                                            <ShareButton
+                                                url={typeof window !== 'undefined' ? window.location.href : ''}
+                                                title={`${village.name} - Singgah`}
+                                                description={village.short_description || `Jelajahi ${village.name} di Singgah.`}
+                                                size="sm"
+                                            />
+                                            <BookmarkButton
+                                                type="village"
+                                                id={village.id}
+                                                initialWishlisted={isWishlisted}
+                                                isLoggedIn={isLoggedIn}
+                                                size="sm"
+                                            />
+                                        </div>
                                         <h1
-                                            className="mb-1 text-2xl font-bold text-gray-900"
+                                            className="mb-1 pr-16 text-2xl font-bold text-gray-900"
                                             style={{
                                                 fontFamily:
                                                     'var(--font-jakarta)',
@@ -465,7 +499,7 @@ export default function VillageShow({
                                                 <div className="mt-2">
                                                     <Link
                                                         href={`/explore?kategori=${village.category}`}
-                                                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-[var(--singgah-green-400)] hover:bg-[var(--singgah-green-50)]"
+                                                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-(--singgah-green-400) hover:bg-(--singgah-green-50)"
                                                     >
                                                         <span>
                                                             {categoryIcons[
@@ -581,7 +615,7 @@ export default function VillageShow({
                                                             className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md"
                                                         >
                                                             <div
-                                                                className="flex h-12 w-12 flex-shrink-0 flex-col items-center justify-center rounded-xl text-white"
+                                                                className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl text-white"
                                                                 style={{
                                                                     background:
                                                                         'var(--singgah-green-600)',
@@ -714,7 +748,7 @@ export default function VillageShow({
                                                             <img
                                                                 src={evSrc}
                                                                 alt={ev.name}
-                                                                className="h-20 w-24 flex-shrink-0 rounded-xl object-cover"
+                                                                className="h-20 w-24 shrink-0 rounded-xl object-cover"
                                                             />
                                                         )}
                                                         <div className="flex-1">
@@ -740,7 +774,7 @@ export default function VillageShow({
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <ChevronRight className="mt-1 h-4 w-4 flex-shrink-0 text-gray-400" />
+                                                        <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-gray-400" />
                                                     </Link>
                                                 );
                                             })}

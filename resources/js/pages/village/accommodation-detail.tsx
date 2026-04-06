@@ -10,6 +10,8 @@ import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
 import StarRating from '@/components/public/StarRating';
 import ReviewForm from '@/components/public/ReviewForm';
+import BookmarkButton from '@/components/public/BookmarkButton';
+import ShareButton from '@/components/public/ShareButton';
 
 interface MediaItem {
     id: number;
@@ -43,6 +45,7 @@ interface Props {
     village: { id: number; name: string; slug: string };
     accommodation: Accommodation;
     userReview: { id: number; rating: number; comment: string | null } | null;
+    isWishlisted?: boolean;
 }
 
 const fmt = (n: number | null) =>
@@ -58,6 +61,7 @@ export default function AccommodationDetail({
     village,
     accommodation,
     userReview,
+    isWishlisted = false,
 }: Props) {
     const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
     const isLoggedIn = !!auth?.user;
@@ -98,24 +102,25 @@ export default function AccommodationDetail({
                     <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
                         {/* Left */}
                         <div className="space-y-8">
-                            <div>
-                                <span
-                                    className="mb-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white"
-                                    style={{
-                                        background: 'var(--singgah-sky-600)',
-                                    }}
-                                >
-                                    🏠 Akomodasi
-                                </span>
-                                <h1
-                                    className="mb-2 text-2xl font-bold text-gray-900"
-                                    style={{
-                                        fontFamily: 'var(--font-jakarta)',
-                                    }}
-                                >
-                                    {accommodation.name}
-                                </h1>
-                                <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <span
+                                        className="mb-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white"
+                                        style={{
+                                            background: 'var(--singgah-sky-600)',
+                                        }}
+                                    >
+                                        🏠 Akomodasi
+                                    </span>
+                                    <h1
+                                        className="mb-2 text-2xl font-bold text-gray-900"
+                                        style={{
+                                            fontFamily: 'var(--font-jakarta)',
+                                        }}
+                                    >
+                                        {accommodation.name}
+                                    </h1>
+                                    <div className="flex flex-wrap items-center gap-3">
                                     <div className="flex items-center gap-1.5">
                                         <StarRating
                                             value={Math.round(avg)}
@@ -138,6 +143,19 @@ export default function AccommodationDetail({
                                             {accommodation.location}
                                         </div>
                                     )}
+                                    </div>
+                                </div>
+                                <div className="flex shrink-0 gap-1 mt-6 -mr-2">
+                                    <ShareButton
+                                        url={typeof window !== 'undefined' ? window.location.href : ''}
+                                        title={`${accommodation.name} - Singgah`}
+                                    />
+                                    <BookmarkButton
+                                        type="accommodation"
+                                        id={accommodation.id}
+                                        initialWishlisted={isWishlisted}
+                                        isLoggedIn={isLoggedIn}
+                                    />
                                 </div>
                             </div>
 
@@ -228,7 +246,7 @@ export default function AccommodationDetail({
                                     accommodation.price_max) && (
                                     <div className="mb-3 flex items-start gap-3">
                                         <IndianRupee
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
+                                            className="mt-0.5 h-4 w-4 shrink-0"
                                             style={{
                                                 color: 'var(--singgah-green-600)',
                                             }}
@@ -251,7 +269,7 @@ export default function AccommodationDetail({
                                 {accommodation.contact_info && (
                                     <div className="mb-3 flex items-start gap-3">
                                         <Phone
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
+                                            className="mt-0.5 h-4 w-4 shrink-0"
                                             style={{
                                                 color: 'var(--singgah-green-600)',
                                             }}
@@ -268,7 +286,7 @@ export default function AccommodationDetail({
                                 )}
                                 <div className="flex items-start gap-3">
                                     <BedDouble
-                                        className="mt-0.5 h-4 w-4 flex-shrink-0"
+                                        className="mt-0.5 h-4 w-4 shrink-0"
                                         style={{
                                             color: 'var(--singgah-green-600)',
                                         }}

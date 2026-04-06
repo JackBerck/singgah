@@ -4,6 +4,8 @@ import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
 import StarRating from '@/components/public/StarRating';
 import ReviewForm from '@/components/public/ReviewForm';
+import BookmarkButton from '@/components/public/BookmarkButton';
+import ShareButton from '@/components/public/ShareButton';
 
 interface MediaItem {
     id: number;
@@ -37,6 +39,7 @@ interface Props {
     village: { id: number; name: string; slug: string };
     attraction: Attraction;
     userReview: { id: number; rating: number; comment: string | null } | null;
+    isWishlisted?: boolean;
 }
 
 const fmt = (n: number | null) =>
@@ -52,6 +55,7 @@ export default function AttractionDetail({
     village,
     attraction,
     userReview,
+    isWishlisted = false,
 }: Props) {
     const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
     const isLoggedIn = !!auth?.user;
@@ -92,16 +96,17 @@ export default function AttractionDetail({
                     <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
                         {/* Left */}
                         <div className="space-y-8">
-                            <div>
-                                <h1
-                                    className="mb-2 text-2xl font-bold text-gray-900"
-                                    style={{
-                                        fontFamily: 'var(--font-jakarta)',
-                                    }}
-                                >
-                                    {attraction.name}
-                                </h1>
-                                <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h1
+                                        className="mb-2 text-2xl font-bold text-gray-900"
+                                        style={{
+                                            fontFamily: 'var(--font-jakarta)',
+                                        }}
+                                    >
+                                        {attraction.name}
+                                    </h1>
+                                    <div className="flex flex-wrap items-center gap-3">
                                     <div className="flex items-center gap-1.5">
                                         <StarRating
                                             value={Math.round(avg)}
@@ -123,6 +128,19 @@ export default function AttractionDetail({
                                             {attraction.location}
                                         </div>
                                     )}
+                                    </div>
+                                </div>
+                                <div className="flex shrink-0 gap-1 -mt-2 -mr-2">
+                                    <ShareButton
+                                        url={typeof window !== 'undefined' ? window.location.href : ''}
+                                        title={`${attraction.name} - Singgah`}
+                                    />
+                                    <BookmarkButton
+                                        type="attraction"
+                                        id={attraction.id}
+                                        initialWishlisted={isWishlisted}
+                                        isLoggedIn={isLoggedIn}
+                                    />
                                 </div>
                             </div>
 
@@ -214,7 +232,7 @@ export default function AttractionDetail({
                                     attraction.price_max) && (
                                     <div className="mb-3 flex items-start gap-3">
                                         <IndianRupee
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
+                                            className="mt-0.5 h-4 w-4 shrink-0"
                                             style={{
                                                 color: 'var(--singgah-green-600)',
                                             }}
@@ -237,7 +255,7 @@ export default function AttractionDetail({
                                 {attraction.contact_info && (
                                     <div className="flex items-start gap-3">
                                         <Phone
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
+                                            className="mt-0.5 h-4 w-4 shrink-0"
                                             style={{
                                                 color: 'var(--singgah-green-600)',
                                             }}

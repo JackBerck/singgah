@@ -2,6 +2,8 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { Calendar, MapPin, ChevronRight } from 'lucide-react';
 import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
+import BookmarkButton from '@/components/public/BookmarkButton';
+import ShareButton from '@/components/public/ShareButton';
 
 interface MediaItem {
     id: number;
@@ -23,6 +25,7 @@ interface Event {
 interface Props {
     village: { id: number; name: string; slug: string };
     event: Event;
+    isWishlisted?: boolean;
 }
 
 const fmtDate = (d: string) =>
@@ -35,7 +38,9 @@ const fmtDate = (d: string) =>
         minute: '2-digit',
     });
 
-export default function EventDetail({ village, event }: Props) {
+export default function EventDetail({ village, event, isWishlisted = false }: Props) {
+    const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
+    const isLoggedIn = !!auth?.user;
     return (
         <PublicLayout>
             <Head title={`${event.name} — ${village.name} — Singgah`} />
@@ -76,12 +81,26 @@ export default function EventDetail({ village, event }: Props) {
                         📅 Event Desa
                     </span>
 
-                    <h1
-                        className="mb-4 text-3xl leading-tight font-extrabold text-gray-900"
-                        style={{ fontFamily: 'var(--font-jakarta)' }}
-                    >
-                        {event.name}
-                    </h1>
+                    <div className="flex items-start justify-between gap-4">
+                        <h1
+                            className="mb-4 text-3xl leading-tight font-extrabold text-gray-900"
+                            style={{ fontFamily: 'var(--font-jakarta)' }}
+                        >
+                            {event.name}
+                        </h1>
+                        <div className="flex shrink-0 gap-1 -mt-2 -mr-2">
+                            <ShareButton
+                                url={typeof window !== 'undefined' ? window.location.href : ''}
+                                title={`${event.name} - Singgah`}
+                            />
+                            <BookmarkButton
+                                type="event"
+                                id={event.id}
+                                initialWishlisted={isWishlisted}
+                                isLoggedIn={isLoggedIn}
+                            />
+                        </div>
+                    </div>
 
                     {/* Meta info */}
                     <div className="mb-6 flex flex-wrap gap-4">

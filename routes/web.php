@@ -7,6 +7,7 @@ use App\Http\Controllers\VillageProfileController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\Public\ReviewController as PublicReviewController;
+use App\Http\Controllers\Public\WishlistController;
 use App\Http\Controllers\Auth\RegisteredManagerController;
 use App\Http\Controllers\Manager\AccommodationController;
 use App\Http\Controllers\Manager\AttractionController;
@@ -53,8 +54,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reviews', [PublicReviewController::class, 'store'])->name('reviews.store');
     Route::delete('/reviews/{id}', [PublicReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    // User Profile
+    // Wishlist toggle (AJAX)
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+    // User Profile pages (separate pages)
     Route::get('/profil', [UserProfileController::class, 'show'])->name('profil.show');
+    Route::get('/profil/keamanan', [UserProfileController::class, 'keamanan'])->name('profil.keamanan');
+    Route::get('/profil/ulasan', [UserProfileController::class, 'ulasan'])->name('profil.ulasan');
+    Route::get('/profil/wishlist', [WishlistController::class, 'index'])->name('profil.wishlist');
     Route::post('/profil', [UserProfileController::class, 'update'])->name('profil.update');
     Route::put('/profil/password', [UserProfileController::class, 'updatePassword'])->name('profil.password');
 });

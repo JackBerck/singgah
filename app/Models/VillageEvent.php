@@ -45,6 +45,11 @@ class VillageEvent extends Model
         return $this->morphMany(Media::class, 'mediable')->orderBy('order');
     }
 
+    public function wishlists(): MorphMany
+    {
+        return $this->morphMany(Wishlist::class, 'wishlistable');
+    }
+
     // ─── Scopes ──────────────────────────────────────────────────────────────────
 
     public function scopeUpcoming($query)
