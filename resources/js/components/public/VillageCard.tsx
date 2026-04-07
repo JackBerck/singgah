@@ -11,6 +11,7 @@ export interface VillageCardData {
     cover_image: string | null;
     reviews_count: number;
     reviews_avg_rating: number;
+    distance_km?: number;
 }
 
 export default function VillageCard({ village }: { village: VillageCardData }) {
@@ -60,9 +61,16 @@ export default function VillageCard({ village }: { village: VillageCardData }) {
 
             {/* Body */}
             <div className="p-4">
-                <h3 className="line-clamp-1 font-semibold text-gray-900 transition-colors group-hover:text-[var(--singgah-green-700)]">
-                    {village.name}
-                </h3>
+                <div className="flex items-start justify-between gap-2">
+                    <h3 className="line-clamp-1 font-semibold text-gray-900 transition-colors group-hover:text-[var(--singgah-green-700)]">
+                        {village.name}
+                    </h3>
+                    {village.distance_km !== undefined && (
+                        <div className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-semibold text-gray-600">
+                            {village.distance_km} km
+                        </div>
+                    )}
+                </div>
                 {location && (
                     <div className="small-font-size mt-1.5 flex items-center gap-1 text-gray-500">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />

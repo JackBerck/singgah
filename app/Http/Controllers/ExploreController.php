@@ -15,8 +15,12 @@ class ExploreController extends Controller
         $kategori  = $request->input('kategori', '');
         $sort      = $request->input('sort', 'terbaru');
         $ratingMin = $request->input('rating_min', '');
+        $lat       = $request->input('lat');
+        $lng       = $request->input('lng');
 
+        // Note: we inject 'villages.*' when adding extra select columns
         $query = Village::verified()
+            ->select('villages.*')
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
             ->with(['media' => fn($q) => $q->where('type', 'image')->orderBy('order')->limit(1)]);
@@ -48,18 +52,29 @@ class ExploreController extends Controller
             );
         }
 
-        match ($sort) {
-            'rating'  => $query->orderByDesc('reviews_avg_rating'),
-            'nama'    => $query->orderBy('name'),
-            default   => $query->latest(),
-        };
+        // If terdekat, apply haversine logic
+        if ($sort === 'terdekat' && $lat && $lng) {
+            $haversine = "( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) )";
+            $query->selectRaw("{$haversine} AS distance", [$lat, $lng, $lat])
+                  ->whereRaw("{$haversine} <= 5", [$lat, $lng, $lat])
+                  ->orderBy('distance');
+        } else {
+            match ($sort) {
+                'rating'  => $query->orderByDesc('reviews_avg_rating'),
+                'nama'    => $query->orderBy('name'),
+                default   => $query->latest(),
+            };
+        }
 
         $villages = $query->paginate(12)->withQueryString();
 
         // Format for frontend
-        $villages->through(function ($v) {
+        $villages->through(function ($v) use ($sort) {
             $v->cover_image = $v->media->first()?->file_path;
             $v->reviews_avg_rating = round((float) $v->reviews_avg_rating, 1);
+            if ($sort === 'terdekat' && isset($v->distance)) {
+                $v->distance_km = round((float) $v->distance, 1);
+            }
             unset($v->media);
             return $v;
         });
@@ -72,6 +87,8 @@ class ExploreController extends Controller
                 'kategori'   => $kategori,
                 'sort'       => $sort,
                 'rating_min' => $ratingMin,
+                'lat'        => $lat,
+                'lng'        => $lng,
             ],
         ]);
     }

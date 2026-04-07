@@ -11,6 +11,7 @@ import {
     ArrowRight,
     Check,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import PublicLayout from '@/layouts/PublicLayout';
 import VillageCard, {
@@ -57,6 +58,8 @@ interface Filters {
     kategori: string;
     sort: string;
     rating_min: string;
+    lat?: number | null;
+    lng?: number | null;
 }
 
 interface Props {
@@ -94,6 +97,7 @@ const sortOptions = [
     { value: 'terbaru', label: 'Terbaru' },
     { value: 'rating', label: 'Rating Tertinggi' },
     { value: 'nama', label: 'Nama A–Z' },
+    { value: 'terdekat', label: '📍 Terdekat Lokasiku (5km)' },
 ];
 
 // ─── Smart Pagination ─────────────────────────────────────────────────────────
@@ -189,6 +193,8 @@ export default function Explore({ villages, filters }: Props) {
     const [kategori, setKategori] = useState(filters.kategori);
     const [sort, setSort] = useState(filters.sort || 'terbaru');
     const [ratingMin, setRatingMin] = useState(filters.rating_min);
+    const [lat, setLat] = useState<number | null>(filters.lat || null);
+    const [lng, setLng] = useState<number | null>(filters.lng || null);
     const [showMobileFilter, setShowMobileFilter] = useState(false);
 
     const currentPage =
@@ -205,6 +211,8 @@ export default function Explore({ villages, filters }: Props) {
                 kategori,
                 sort,
                 rating_min: ratingMin,
+                lat,
+                lng,
                 ...overrides,
                 page: 1,
             },
@@ -219,6 +227,8 @@ export default function Explore({ villages, filters }: Props) {
             kategori,
             sort,
             rating_min: ratingMin,
+            lat,
+            lng,
             [key]: '',
         };
         if (key === 'search') setSearch('');
@@ -240,6 +250,8 @@ export default function Explore({ villages, filters }: Props) {
         kategori,
         sort,
         rating_min: ratingMin,
+        lat,
+        lng,
     };
 
     // Filter panel content (shared between sidebar and bottom sheet)
@@ -256,8 +268,31 @@ export default function Explore({ villages, filters }: Props) {
                             key={opt.value}
                             type="button"
                             onClick={() => {
-                                setSort(opt.value);
-                                applyFilters({ sort: opt.value });
+                                if (opt.value === 'terdekat') {
+                                    if (navigator.geolocation) {
+                                        toast.loading('Mencari lokasi Anda...', { id: 'geo-loc' });
+                                        navigator.geolocation.getCurrentPosition(
+                                            (pos) => {
+                                                const newLat = pos.coords.latitude;
+                                                const newLng = pos.coords.longitude;
+                                                setLat(newLat);
+                                                setLng(newLng);
+                                                setSort(opt.value);
+                                                toast.success('Lokasi ditemukan!', { id: 'geo-loc' });
+                                                applyFilters({ sort: opt.value, lat: newLat, lng: newLng });
+                                            },
+                                            (err) => {
+                                                console.error(err);
+                                                toast.error('Akses lokasi ditolak atau gagal. Pastikan pengaturan browser mengizinkan.', { id: 'geo-loc' });
+                                            }
+                                        );
+                                    } else {
+                                        toast.error('Browser ini tidak mendukung deteksi lokasi.');
+                                    }
+                                } else {
+                                    setSort(opt.value);
+                                    applyFilters({ sort: opt.value });
+                                }
                             }}
                             className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors ${
                                 sort === opt.value
@@ -445,7 +480,7 @@ export default function Explore({ villages, filters }: Props) {
                         setRatingMin('');
                         router.get(
                             '/explore',
-                            { sort },
+                            { sort, lat, lng },
                             { preserveState: true, replace: true },
                         );
                     }}
