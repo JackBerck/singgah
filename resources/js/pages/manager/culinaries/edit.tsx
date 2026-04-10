@@ -27,6 +27,9 @@ interface Culinary {
     price_max: number | null;
     location: string | null;
     contact_info: string | null;
+    open_time: string | null;
+    close_time: string | null;
+    map_url: string | null;
     media: Media[];
 }
 interface Props {
@@ -81,6 +84,9 @@ export default function EditCulinary({ village, culinary }: Props) {
         price_max: culinary.price_max?.toString() ?? '',
         location: culinary.location ?? '',
         contact_info: culinary.contact_info ?? '',
+        open_time: culinary.open_time ?? '',
+        close_time: culinary.close_time ?? '',
+        map_url: culinary.map_url ?? '',
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -93,6 +99,9 @@ export default function EditCulinary({ village, culinary }: Props) {
         formData.append('price_max', data.price_max);
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
+        if (data.open_time) formData.append('open_time', data.open_time);
+        if (data.close_time) formData.append('close_time', data.close_time);
+        if (data.map_url) formData.append('map_url', data.map_url);
 
         existingMediaIds.forEach((id) => {
             formData.append('existing_media_ids[]', id.toString());
@@ -189,18 +198,67 @@ export default function EditCulinary({ village, culinary }: Props) {
                                     />
                                 </Field>
                                 <Field
-                                    label="Info Kontak"
-                                    error={errors.contact_info}
+                                    label="Jam Buka"
+                                    error={errors.open_time}
                                 >
                                     <Input
-                                        value={data.contact_info}
+                                        type="time"
+                                        value={data.open_time}
                                         onChange={(e) =>
                                             setData(
-                                                'contact_info',
+                                                'open_time',
                                                 e.target.value,
                                             )
                                         }
+                                        hasError={!!errors.open_time}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Field
+                                    label="Jam Tutup"
+                                    error={errors.close_time}
+                                >
+                                    <Input
+                                        type="time"
+                                        value={data.close_time}
+                                        onChange={(e) =>
+                                            setData(
+                                                'close_time',
+                                                e.target.value,
+                                            )
+                                        }
+                                        hasError={!!errors.close_time}
+                                    />
+                                </Field>
+                                <Field
+                                    label="Info Kontak (Nomor HP)"
+                                    error={errors.contact_info}
+                                >
+                                    <Input
+                                        type="tel"
+                                        value={data.contact_info}
+                                        onChange={(e) =>
+                                            setData('contact_info', e.target.value.replace(/\D/g, ''))
+                                        }
+                                        placeholder="0812xxxxxxxx"
                                         hasError={!!errors.contact_info}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <Field
+                                    label="Tautan Peta (Google Maps)"
+                                    error={errors.map_url}
+                                >
+                                    <Input
+                                        type="url"
+                                        value={data.map_url}
+                                        onChange={(e) =>
+                                            setData('map_url', e.target.value)
+                                        }
+                                        placeholder="https://maps.app.goo.gl/..."
+                                        hasError={!!errors.map_url}
                                     />
                                 </Field>
                             </div>

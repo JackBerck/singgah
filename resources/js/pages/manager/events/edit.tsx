@@ -28,6 +28,7 @@ interface Event {
     end_date: string | null;
     location: string | null;
     contact_info: string | null;
+    map_url: string | null;
     is_featured: boolean;
     media: Media[];
 }
@@ -93,6 +94,7 @@ export default function EditEvent({ village, event }: Props) {
         end_date: toISO(event.end_date),
         location: event.location ?? '',
         contact_info: event.contact_info ?? '',
+        map_url: event.map_url ?? '',
         is_featured: event.is_featured,
     });
 
@@ -107,6 +109,7 @@ export default function EditEvent({ village, event }: Props) {
         formData.append('end_date', data.end_date);
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
+        if (data.map_url) formData.append('map_url', data.map_url);
         formData.append('is_featured', data.is_featured ? '1' : '0');
 
         existingMediaIds.forEach((id) => {
@@ -209,18 +212,33 @@ export default function EditEvent({ village, event }: Props) {
                                     />
                                 </Field>
                                 <Field
-                                    label="Info Kontak"
+                                    label="Info Kontak (Nomor HP)"
                                     error={errors.contact_info}
                                 >
                                     <Input
+                                        type="tel"
                                         value={data.contact_info}
                                         onChange={(e) =>
-                                            setData(
-                                                'contact_info',
-                                                e.target.value,
-                                            )
+                                            setData('contact_info', e.target.value.replace(/\D/g, ''))
                                         }
+                                        placeholder="0812xxxxxxxx"
                                         hasError={!!errors.contact_info}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <Field
+                                    label="Tautan Peta (Google Maps)"
+                                    error={errors.map_url}
+                                >
+                                    <Input
+                                        type="url"
+                                        value={data.map_url}
+                                        onChange={(e) =>
+                                            setData('map_url', e.target.value)
+                                        }
+                                        placeholder="https://maps.app.goo.gl/..."
+                                        hasError={!!errors.map_url}
                                     />
                                 </Field>
                             </div>

@@ -22,6 +22,7 @@ class VillageEvent extends Model
         'end_date',
         'contact_info',
         'is_featured',
+        'map_url',
     ];
 
     protected function casts(): array

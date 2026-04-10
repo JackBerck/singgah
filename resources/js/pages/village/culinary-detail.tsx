@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { MapPin, Phone, IndianRupee, ChevronRight } from 'lucide-react';
+import { MapPin, Phone, IndianRupee, ChevronRight, Clock, ExternalLink } from 'lucide-react';
 import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
 import StarRating from '@/components/public/StarRating';
@@ -29,6 +29,9 @@ interface Culinary {
     price_min: number | null;
     price_max: number | null;
     contact_info: string | null;
+    open_time: string | null;
+    close_time: string | null;
+    map_url: string | null;
     media: MediaItem[];
     reviews: Review[];
     reviews_count: number;
@@ -271,8 +274,53 @@ export default function CulinaryDetail({
                                                 Kontak
                                             </p>
                                             <p className="text-sm text-gray-800">
-                                                {culinary.contact_info}
+                                                <a href={`https://wa.me/${culinary.contact_info.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                                    {culinary.contact_info}
+                                                </a>
                                             </p>
+                                        </div>
+                                    </div>
+                                )}
+                                {(culinary.open_time || culinary.close_time) && (
+                                    <div className="flex items-start gap-3 mt-3">
+                                        <Clock
+                                            className="mt-0.5 h-4 w-4 shrink-0"
+                                            style={{
+                                                color: 'var(--singgah-green-600)',
+                                            }}
+                                        />
+                                        <div>
+                                            <p className="text-xs text-gray-500">
+                                                Jam Buka
+                                            </p>
+                                            <p className="font-semibold text-gray-800 text-sm">
+                                                {culinary.open_time ? culinary.open_time.slice(0, 5) : '—'} - {culinary.close_time ? culinary.close_time.slice(0, 5) : '—'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                                {culinary.map_url && (
+                                    <div className="flex items-start gap-3 mt-4">
+                                        <MapPin
+                                            className="mt-0.5 h-4 w-4 shrink-0"
+                                            style={{
+                                                color: 'var(--singgah-green-600)',
+                                            }}
+                                        />
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1">
+                                                Google Maps
+                                            </p>
+                                            <a
+                                                href={culinary.map_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:border-(--singgah-green-400) hover:bg-(--singgah-green-50)"
+                                                style={{ color: 'var(--singgah-green-700)' }}
+                                            >
+                                                <span>Buka Peta</span>
+                                                <ExternalLink className="h-3 w-3" />
+                                            </a>
                                         </div>
                                     </div>
                                 )}

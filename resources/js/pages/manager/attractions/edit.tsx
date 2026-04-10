@@ -27,7 +27,9 @@ interface Attraction {
     price_max: number | null;
     location: string | null;
     contact_info: string | null;
-    operating_hours: string | null;
+    open_time: string | null;
+    close_time: string | null;
+    map_url: string | null;
     media: Media[];
 }
 interface Props {
@@ -82,7 +84,9 @@ export default function EditAttraction({ village, attraction }: Props) {
         price_max: attraction.price_max?.toString() ?? '',
         location: attraction.location ?? '',
         contact_info: attraction.contact_info ?? '',
-        operating_hours: attraction.operating_hours ?? '',
+        open_time: attraction.open_time ?? '',
+        close_time: attraction.close_time ?? '',
+        map_url: attraction.map_url ?? '',
     });
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,7 +99,9 @@ export default function EditAttraction({ village, attraction }: Props) {
         formData.append('price_max', data.price_max);
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
-        formData.append('operating_hours', data.operating_hours);
+        if (data.open_time) formData.append('open_time', data.open_time);
+        if (data.close_time) formData.append('close_time', data.close_time);
+        if (data.map_url) formData.append('map_url', data.map_url);
 
         existingMediaIds.forEach((id) => {
             formData.append('existing_media_ids[]', id.toString());
@@ -192,33 +198,68 @@ export default function EditAttraction({ village, attraction }: Props) {
                                     />
                                 </Field>
                                 <Field
-                                    label="Jam Operasional"
-                                    error={errors.operating_hours}
+                                    label="Jam Buka"
+                                    error={errors.open_time}
                                 >
                                     <Input
-                                        value={data.operating_hours}
+                                        type="time"
+                                        value={data.open_time}
                                         onChange={(e) =>
                                             setData(
-                                                'operating_hours',
+                                                'open_time',
                                                 e.target.value,
                                             )
                                         }
-                                        hasError={!!errors.operating_hours}
+                                        hasError={!!errors.open_time}
+                                    />
+                                </Field>
+                                <Field
+                                    label="Jam Tutup"
+                                    error={errors.close_time}
+                                >
+                                    <Input
+                                        type="time"
+                                        value={data.close_time}
+                                        onChange={(e) =>
+                                            setData(
+                                                'close_time',
+                                                e.target.value,
+                                            )
+                                        }
+                                        hasError={!!errors.close_time}
                                     />
                                 </Field>
                             </div>
-                            <Field
-                                label="Info Kontak"
-                                error={errors.contact_info}
-                            >
-                                <Input
-                                    value={data.contact_info}
-                                    onChange={(e) =>
-                                        setData('contact_info', e.target.value)
-                                    }
-                                    hasError={!!errors.contact_info}
-                                />
-                            </Field>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Field
+                                    label="Info Kontak (Nomor HP)"
+                                    error={errors.contact_info}
+                                >
+                                    <Input
+                                        type="tel"
+                                        value={data.contact_info}
+                                        onChange={(e) =>
+                                            setData('contact_info', e.target.value.replace(/\D/g, ''))
+                                        }
+                                        placeholder="0812xxxxxxxx"
+                                        hasError={!!errors.contact_info}
+                                    />
+                                </Field>
+                                <Field
+                                    label="Tautan Peta (Google Maps)"
+                                    error={errors.map_url}
+                                >
+                                    <Input
+                                        type="url"
+                                        value={data.map_url}
+                                        onChange={(e) =>
+                                            setData('map_url', e.target.value)
+                                        }
+                                        placeholder="https://maps.app.goo.gl/..."
+                                        hasError={!!errors.map_url}
+                                    />
+                                </Field>
+                            </div>
                         </div>
                         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                             <MediaInput

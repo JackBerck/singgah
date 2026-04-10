@@ -19,7 +19,8 @@ class StoreEventRequest extends FormRequest
             'event_date'   => ['required', 'date'],
             'end_date'     => ['nullable', 'date', 'after_or_equal:event_date'],
             'location'     => ['nullable', 'string', 'max:255'],
-            'contact_info' => ['nullable', 'string', 'max:255'],
+            'contact_info' => ['nullable', 'numeric'],
+            'map_url'      => ['nullable', 'url', 'max:1000'],
             'is_featured'  => ['boolean'],
             'existing_media_ids' => ['nullable', 'array'],
             'existing_media_ids.*' => ['integer', 'exists:media,id'],
@@ -36,6 +37,8 @@ class StoreEventRequest extends FormRequest
             'event_date'  => 'Tanggal Acara',
             'end_date'    => 'Tanggal Selesai',
             'location'    => 'Lokasi',
+            'contact_info'=> 'Info Kontak',
+            'map_url'     => 'Tautan Google Maps',
         ];
     }
 }

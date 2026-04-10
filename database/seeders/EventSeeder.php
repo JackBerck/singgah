@@ -105,6 +105,7 @@ class EventSeeder extends Seeder
                     'slug'         => Str::slug($data['name']),
                     'description'  => $data['description'],
                     'location'     => $data['location'],
+                    'map_url'      => 'https://maps.google.com/?q=' . urlencode($data['name'] . ', ' . $village->name),
                     'event_date'   => $eventDate,
                     'end_date'     => $eventDate->copy()->addDays(fake()->numberBetween(1, 3)),
                     'contact_info' => $data['contact'],

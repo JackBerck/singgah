@@ -1,16 +1,15 @@
 import { Head, Link } from '@inertiajs/react';
 import {
-    MapPin,
-    Star,
     ArrowRight,
-    Search,
-    ChevronRight,
+    MapPin,
     Trees,
     Landmark,
     UtensilsCrossed,
     Sprout,
     Waves,
     Palette,
+    type LucideIcon,
+    StretchHorizontalIcon,
 } from 'lucide-react';
 
 import PublicLayout from '@/layouts/PublicLayout';
@@ -20,6 +19,18 @@ import VillageCard, { VillageCardData } from '@/components/public/VillageCard';
 
 type Village = VillageCardData;
 
+interface HomeCategory {
+    slug: string;
+    label: string;
+    count: number;
+}
+
+interface HomeRegion {
+    province: string;
+    count: number;
+    slug: string;
+}
+
 interface Stats {
     villages_count: number;
     provinces_count: number;
@@ -28,26 +39,33 @@ interface Stats {
 
 interface HomeProps {
     featuredVillages: Village[];
+    categories: HomeCategory[];
+    regions: HomeRegion[];
     newVillages: Village[];
     stats: Stats;
 }
 
-// ─── Static Data ──────────────────────────────────────────────────────────────
+const categoryIcons: Record<string, LucideIcon> = {
+    wisata_alam: Trees,
+    budaya_tradisi: Landmark,
+    kuliner_lokal: UtensilsCrossed,
+    agrowisata: Sprout,
+    pesisir_bahari: Waves,
+    desa_kreatif: Palette,
+};
 
-const categories = [
-    { icon: Trees, label: 'Wisata Alam', count: 142, slug: 'alam' },
-    { icon: Landmark, label: 'Budaya & Tradisi', count: 98, slug: 'budaya' },
-    {
-        icon: UtensilsCrossed,
-        label: 'Kuliner Lokal',
-        count: 76,
-        slug: 'kuliner',
-    },
-    { icon: Sprout, label: 'Agrowisata', count: 64, slug: 'agrowisata' },
-    { icon: Waves, label: 'Pesisir & Bahari', count: 53, slug: 'pesisir' },
-    { icon: Palette, label: 'Desa Kreatif', count: 38, slug: 'kreatif' },
+const regionGradients = [
+    'from-orange-900/75 via-orange-800/55 to-orange-600/35',
+    'from-slate-900/75 via-slate-800/55 to-slate-600/35',
+    'from-teal-900/75 via-teal-800/55 to-teal-600/35',
+    'from-green-900/75 via-green-800/55 to-green-600/35',
+    'from-blue-900/75 via-blue-800/55 to-blue-600/35',
+    'from-amber-900/75 via-amber-800/55 to-amber-600/35',
+    'from-rose-900/75 via-rose-800/55 to-rose-600/35',
+    'from-emerald-900/75 via-emerald-800/55 to-emerald-600/35',
 ];
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
 const regions = [
     {
         name: 'Bali',
@@ -107,7 +125,6 @@ const regions = [
     },
 ];
 
-// Unsplash landscape colors as CSS background fallback per region
 const regionColors: Record<string, string> = {
     bali: '#7c3b1e',
     yogyakarta: '#2e3a4e',
@@ -118,8 +135,6 @@ const regionColors: Record<string, string> = {
     flores: '#7b2233',
     kaltim: '#1a5c3a',
 };
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionHeader({
     label,
@@ -144,7 +159,7 @@ function SectionHeader({
             {cta && ctaHref && (
                 <Link
                     href={ctaHref}
-                    className="normal-font-size flex flex-shrink-0 items-center gap-1.5 font-semibold transition-colors hover:underline"
+                    className="normal-font-size flex shrink-0 items-center gap-1.5 font-semibold transition-colors hover:underline"
                     style={{ color: 'var(--singgah-green-600)' }}
                 >
                     {cta} <ArrowRight className="h-4 w-4" />
@@ -158,6 +173,8 @@ function SectionHeader({
 
 export default function Home({
     featuredVillages,
+    categories,
+    // regions,
     newVillages,
     stats,
 }: HomeProps) {
@@ -335,32 +352,6 @@ export default function Home({
                                     Tentang Kami
                                 </Link>
                             </div>
-
-                            {/* Search Bar */}
-                            <div
-                                className="flex max-w-lg items-center gap-2 rounded-2xl p-1.5"
-                                style={{
-                                    background: 'rgba(255,255,255,0.12)',
-                                    border: '1.5px solid rgba(255,255,255,0.2)',
-                                }}
-                            >
-                                <div className="flex flex-1 items-center gap-2 rounded-xl bg-white px-4 py-2.5">
-                                    <Search className="h-4 w-4 shrink-0 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Cari desa wisata atau wilayah..."
-                                        className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none"
-                                    />
-                                </div>
-                                <button
-                                    className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                                    style={{
-                                        background: 'var(--singgah-teal-500)',
-                                    }}
-                                >
-                                    Cari
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -400,8 +391,10 @@ export default function Home({
                     />
 
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6">
-                        {categories.map(
-                            ({ icon: Icon, label, count, slug }) => (
+                        {categories.map(({ label, count, slug }) => {
+                            const Icon = categoryIcons[slug] ?? Trees;
+
+                            return (
                                 <Link
                                     key={slug}
                                     href={`/explore?kategori=${slug}`}
@@ -424,8 +417,26 @@ export default function Home({
                                         {count} desa
                                     </span>
                                 </Link>
-                            ),
-                        )}
+                            );
+                        })}
+                        <Link
+                            key="lainnya"
+                            href={`/explore`}
+                            className="category-card group text-center"
+                        >
+                            <span
+                                className="category-icon flex h-12 w-12 items-center justify-center rounded-xl transition-colors"
+                                style={{
+                                    background: 'var(--singgah-green-100)',
+                                    color: 'var(--singgah-green-700)',
+                                }}
+                            >
+                                <StretchHorizontalIcon className="h-6 w-6" />
+                            </span>
+                            <span className="category-label small-font-size text-center leading-tight font-semibold text-gray-700 group-hover:text-gray-100">
+                                Lainnya
+                            </span>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -450,7 +461,7 @@ export default function Home({
                                 {featuredVillages.map((v) => (
                                     <div
                                         key={v.id}
-                                        className="w-64 flex-shrink-0 snap-start"
+                                        className="w-64 shrink-0 snap-start"
                                     >
                                         <VillageCard village={v} />
                                     </div>
@@ -500,18 +511,22 @@ export default function Home({
                             <Link
                                 key={region.name}
                                 href={`/explore?wilayah=${encodeURIComponent(region.province)}`}
-                                className="region-card group aspect-[4/3]"
+                                className="region-card group aspect-4/3"
                             >
                                 {/* Background color per region */}
                                 <div
                                     className="absolute inset-0"
                                     style={{
-                                        background: regionColors[region.image],
+                                        backgroundImage: `url('/img/regions/${region.image}.jpg')`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                        backgroundColor:
+                                            regionColors[region.image],
                                     }}
                                 />
                                 {/* Gradient Overlay */}
                                 <div
-                                    className={`absolute inset-0 bg-gradient-to-t ${region.gradient}`}
+                                    className={`absolute inset-0 bg-linear-to-t ${region.gradient}`}
                                 />
 
                                 {/* Content */}
@@ -524,17 +539,9 @@ export default function Home({
                                     >
                                         {region.province}
                                     </p>
-                                    <h3 className="text-base leading-tight font-bold text-white transition-colors group-hover:text-[var(--singgah-teal-400)] md:text-lg">
+                                    <h3 className="text-base leading-tight font-bold text-white transition-colors group-hover:text-(--singgah-teal-400) md:text-lg">
                                         {region.name}
                                     </h3>
-                                    <p
-                                        className="small-font-size mt-1"
-                                        style={{
-                                            color: 'rgba(255,255,255,0.65)',
-                                        }}
-                                    >
-                                        {region.count} desa
-                                    </p>
                                 </div>
 
                                 {/* Hover Arrow */}
@@ -573,7 +580,7 @@ export default function Home({
                                 {newVillages.map((v) => (
                                     <div
                                         key={v.id}
-                                        className="w-64 flex-shrink-0 snap-start"
+                                        className="w-64 shrink-0 snap-start"
                                     >
                                         <VillageCard village={v} />
                                     </div>

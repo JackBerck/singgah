@@ -117,6 +117,19 @@ class EntitySeeder extends Seeder
             // ─── Attractions ──────────────────────────────────────────────────────
             $attractionList = $attractionsData[$slug] ?? [];
             foreach ($attractionList as $idx => $data) {
+                $rawHours = $data['hours'] ?? '';
+                $openTime = '08:00';
+                $closeTime = '17:00';
+                
+                if (strtolower($rawHours) === 'sepanjang hari') {
+                    $openTime = '00:00';
+                    $closeTime = '23:59';
+                } elseif (str_contains($rawHours, ' - ')) {
+                    $parts = explode(' - ', $rawHours);
+                    $openTime = str_replace('.', ':', trim($parts[0]));
+                    $closeTime = str_replace('.', ':', trim($parts[1]));
+                }
+
                 $attraction = Attraction::create([
                     'village_id'      => $village->id,
                     'name'            => $data['name'],
@@ -125,8 +138,10 @@ class EntitySeeder extends Seeder
                     'price_min'       => $data['price_min'],
                     'price_max'       => $data['price_max'],
                     'location'        => $data['location'],
+                    'map_url'         => 'https://maps.google.com/?q=' . urlencode($data['name'] . ', ' . $village->name),
                     'contact_info'    => fake()->numerify('08##########'),
-                    'operating_hours' => $data['hours'],
+                    'open_time'       => $openTime,
+                    'close_time'      => $closeTime,
                 ]);
 
                 // Media: 2 gambar per attraction
@@ -174,7 +189,10 @@ class EntitySeeder extends Seeder
                     'price_min'    => $data['price_min'],
                     'price_max'    => $data['price_max'],
                     'location'     => $data['location'],
+                    'map_url'      => 'https://maps.google.com/?q=' . urlencode($data['name'] . ', ' . $village->name),
                     'contact_info' => fake()->numerify('08##########'),
+                    'open_time'    => '09:00',
+                    'close_time'   => '21:00',
                 ]);
 
                 // Media: 2 gambar per culinary
@@ -221,8 +239,10 @@ class EntitySeeder extends Seeder
                     'price_min'       => $data['price_min'],
                     'price_max'       => $data['price_max'],
                     'location'        => 'Dalam kawasan desa wisata',
+                    'map_url'         => 'https://maps.google.com/?q=' . urlencode($data['name'] . ', ' . $village->name),
                     'contact_info'    => fake()->numerify('08##########'),
-                    'operating_hours' => $data['hours'],
+                    'open_time'       => '14:00',
+                    'close_time'      => '12:00',
                 ]);
 
                 // Media: 1 gambar per accommodation

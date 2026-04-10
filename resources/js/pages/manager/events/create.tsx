@@ -62,6 +62,7 @@ export default function CreateEvent({ village }: Props) {
             end_date: '',
             location: '',
             contact_info: '',
+            map_url: '',
             is_featured: false,
         });
 
@@ -75,6 +76,7 @@ export default function CreateEvent({ village }: Props) {
         formData.append('end_date', data.end_date);
         formData.append('location', data.location);
         formData.append('contact_info', data.contact_info);
+        if (data.map_url) formData.append('map_url', data.map_url);
         formData.append('is_featured', data.is_featured ? '1' : '0');
 
         files.forEach((file) => {
@@ -175,19 +177,33 @@ export default function CreateEvent({ village }: Props) {
                                     />
                                 </Field>
                                 <Field
-                                    label="Info Kontak"
+                                    label="Info Kontak (Nomor HP)"
                                     error={errors.contact_info}
                                 >
                                     <Input
+                                        type="tel"
                                         value={data.contact_info}
                                         onChange={(e) =>
-                                            setData(
-                                                'contact_info',
-                                                e.target.value,
-                                            )
+                                            setData('contact_info', e.target.value.replace(/\D/g, ''))
                                         }
-                                        placeholder="0812-xxxx-xxxx"
+                                        placeholder="0812xxxxxxxx"
                                         hasError={!!errors.contact_info}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <Field
+                                    label="Tautan Peta (Google Maps)"
+                                    error={errors.map_url}
+                                >
+                                    <Input
+                                        type="url"
+                                        value={data.map_url}
+                                        onChange={(e) =>
+                                            setData('map_url', e.target.value)
+                                        }
+                                        placeholder="https://maps.app.goo.gl/..."
+                                        hasError={!!errors.map_url}
                                     />
                                 </Field>
                             </div>

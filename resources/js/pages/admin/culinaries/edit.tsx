@@ -23,6 +23,9 @@ interface Culinary {
     description: string;
     location: string | null;
     contact_info: string | null;
+    open_time: string | null;
+    close_time: string | null;
+    map_url: string | null;
     price_min: number | null;
     price_max: number | null;
     village: Village;
@@ -78,6 +81,9 @@ export default function AdminEditCulinary({ culinary }: Props) {
         description: culinary.description,
         location: culinary.location ?? '',
         contact_info: culinary.contact_info ?? '',
+        open_time: culinary.open_time ?? '',
+        close_time: culinary.close_time ?? '',
+        map_url: culinary.map_url ?? '',
         price_min: String(culinary.price_min ?? ''),
         price_max: String(culinary.price_max ?? ''),
     });
@@ -183,15 +189,65 @@ export default function AdminEditCulinary({ culinary }: Props) {
                                     />
                                 </Field>
                                 <Field
-                                    label="Info Kontak"
+                                    label="Info Kontak (Nomor HP)"
                                     error={errors.contact_info}
                                 >
                                     <Input
+                                        type="tel"
                                         value={formData.contact_info}
                                         onChange={(e) =>
-                                            set('contact_info', e.target.value)
+                                            set('contact_info', e.target.value.replace(/\D/g, ''))
                                         }
                                         hasError={!!errors.contact_info}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Field
+                                    label="Jam Buka"
+                                    error={errors.open_time}
+                                >
+                                    <Input
+                                        type="time"
+                                        value={formData.open_time}
+                                        onChange={(e) =>
+                                            set(
+                                                'open_time',
+                                                e.target.value,
+                                            )
+                                        }
+                                        hasError={!!errors.open_time}
+                                    />
+                                </Field>
+                                <Field
+                                    label="Jam Tutup"
+                                    error={errors.close_time}
+                                >
+                                    <Input
+                                        type="time"
+                                        value={formData.close_time}
+                                        onChange={(e) =>
+                                            set(
+                                                'close_time',
+                                                e.target.value,
+                                            )
+                                        }
+                                        hasError={!!errors.close_time}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <Field
+                                    label="Tautan Peta (Google Maps)"
+                                    error={errors.map_url}
+                                >
+                                    <Input
+                                        type="url"
+                                        value={formData.map_url}
+                                        onChange={(e) =>
+                                            set('map_url', e.target.value)
+                                        }
+                                        hasError={!!errors.map_url}
                                     />
                                 </Field>
                             </div>

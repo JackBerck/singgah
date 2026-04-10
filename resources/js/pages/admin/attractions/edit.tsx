@@ -23,7 +23,9 @@ interface Attraction {
     description: string;
     location: string | null;
     contact_info: string | null;
-    operating_hours: string | null;
+    open_time: string | null;
+    close_time: string | null;
+    map_url: string | null;
     price_min: number | null;
     price_max: number | null;
     village: Village;
@@ -79,7 +81,9 @@ export default function AdminEditAttraction({ attraction }: Props) {
         description: attraction.description,
         location: attraction.location ?? '',
         contact_info: attraction.contact_info ?? '',
-        operating_hours: attraction.operating_hours ?? '',
+        open_time: attraction.open_time ?? '',
+        close_time: attraction.close_time ?? '',
+        map_url: attraction.map_url ?? '',
         price_min: String(attraction.price_min ?? ''),
         price_max: String(attraction.price_max ?? ''),
     });
@@ -185,31 +189,65 @@ export default function AdminEditAttraction({ attraction }: Props) {
                             </Field>
                             <div className="grid grid-cols-2 gap-4">
                                 <Field
-                                    label="Jam Operasional"
-                                    error={errors.operating_hours}
+                                    label="Jam Buka"
+                                    error={errors.open_time}
                                 >
                                     <Input
-                                        value={formData.operating_hours}
+                                        type="time"
+                                        value={formData.open_time}
                                         onChange={(e) =>
                                             set(
-                                                'operating_hours',
+                                                'open_time',
                                                 e.target.value,
                                             )
                                         }
-                                        hasError={!!errors.operating_hours}
-                                        placeholder="08.00 – 17.00"
+                                        hasError={!!errors.open_time}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Field
+                                    label="Jam Tutup"
+                                    error={errors.close_time}
+                                >
+                                    <Input
+                                        type="time"
+                                        value={formData.close_time}
+                                        onChange={(e) =>
+                                            set(
+                                                'close_time',
+                                                e.target.value,
+                                            )
+                                        }
+                                        hasError={!!errors.close_time}
                                     />
                                 </Field>
                                 <Field
-                                    label="Info Kontak"
+                                    label="Info Kontak (Nomor HP)"
                                     error={errors.contact_info}
                                 >
                                     <Input
+                                        type="tel"
                                         value={formData.contact_info}
                                         onChange={(e) =>
-                                            set('contact_info', e.target.value)
+                                            set('contact_info', e.target.value.replace(/\D/g, ''))
                                         }
                                         hasError={!!errors.contact_info}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <Field
+                                    label="Tautan Peta (Google Maps)"
+                                    error={errors.map_url}
+                                >
+                                    <Input
+                                        type="url"
+                                        value={formData.map_url}
+                                        onChange={(e) =>
+                                            set('map_url', e.target.value)
+                                        }
+                                        hasError={!!errors.map_url}
                                     />
                                 </Field>
                             </div>

@@ -4,6 +4,7 @@ import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
 import BookmarkButton from '@/components/public/BookmarkButton';
 import ShareButton from '@/components/public/ShareButton';
+import { ExternalLink } from 'lucide-react';
 
 interface MediaItem {
     id: number;
@@ -18,6 +19,7 @@ interface Event {
     event_date: string;
     location: string | null;
     contact_info: string | null;
+    map_url: string | null;
     description: string | null;
     media: MediaItem[];
 }
@@ -141,15 +143,38 @@ export default function EventDetail({ village, event, isWishlisted = false }: Pr
                         />
                     )}
 
-                    {/* Contact info */}
-                    {event.contact_info && (
+                    {/* Contact info and Maps */}
+                    {(event.contact_info || event.map_url) && (
                         <div className="mb-8 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                            <p className="mb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                                Kontak
-                            </p>
-                            <p className="text-sm text-gray-800">
-                                {event.contact_info}
-                            </p>
+                            {event.contact_info && (
+                                <div className="mb-4">
+                                    <p className="mb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        Kontak
+                                    </p>
+                                    <p className="text-sm text-gray-800">
+                                        <a href={`https://wa.me/${event.contact_info.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                            {event.contact_info}
+                                        </a>
+                                    </p>
+                                </div>
+                            )}
+                            {event.map_url && (
+                                <div>
+                                    <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        Google Maps
+                                    </p>
+                                    <a
+                                        href={event.map_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:border-(--singgah-green-400) hover:bg-(--singgah-green-50)"
+                                        style={{ color: 'var(--singgah-green-700)' }}
+                                    >
+                                        <span>Buka Peta Lokasi</span>
+                                        <ExternalLink className="h-3 w-3" />
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     )}
 

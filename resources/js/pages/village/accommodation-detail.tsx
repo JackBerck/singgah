@@ -5,6 +5,8 @@ import {
     IndianRupee,
     ChevronRight,
     BedDouble,
+    Clock,
+    ExternalLink,
 } from 'lucide-react';
 import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
@@ -35,6 +37,9 @@ interface Accommodation {
     price_min: number | null;
     price_max: number | null;
     contact_info: string | null;
+    open_time: string | null;
+    close_time: string | null;
+    map_url: string | null;
     media: MediaItem[];
     reviews: Review[];
     reviews_count: number;
@@ -279,8 +284,53 @@ export default function AccommodationDetail({
                                                 Kontak / Reservasi
                                             </p>
                                             <p className="text-sm text-gray-800">
-                                                {accommodation.contact_info}
+                                                <a href={`https://wa.me/${accommodation.contact_info.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                                    {accommodation.contact_info}
+                                                </a>
                                             </p>
+                                        </div>
+                                    </div>
+                                )}
+                                {(accommodation.open_time || accommodation.close_time) && (
+                                    <div className="mb-3 flex items-start gap-3">
+                                        <Clock
+                                            className="mt-0.5 h-4 w-4 shrink-0"
+                                            style={{
+                                                color: 'var(--singgah-green-600)',
+                                            }}
+                                        />
+                                        <div>
+                                            <p className="text-xs text-gray-500">
+                                                Waktu Check-in / Check-out
+                                            </p>
+                                            <p className="font-semibold text-gray-800 text-sm">
+                                                In: {accommodation.open_time ? accommodation.open_time.slice(0, 5) : '—'} / Out: {accommodation.close_time ? accommodation.close_time.slice(0, 5) : '—'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                                {accommodation.map_url && (
+                                    <div className="mb-3 flex items-start gap-3">
+                                        <MapPin
+                                            className="mt-0.5 h-4 w-4 shrink-0"
+                                            style={{
+                                                color: 'var(--singgah-green-600)',
+                                            }}
+                                        />
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1">
+                                                Google Maps
+                                            </p>
+                                            <a
+                                                href={accommodation.map_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:border-(--singgah-green-400) hover:bg-(--singgah-green-50)"
+                                                style={{ color: 'var(--singgah-green-700)' }}
+                                            >
+                                                <span>Buka Peta</span>
+                                                <ExternalLink className="h-3 w-3" />
+                                            </a>
                                         </div>
                                     </div>
                                 )}

@@ -21,7 +21,9 @@ class Attraction extends Model
         'price_max',
         'location',
         'contact_info',
-        'operating_hours',
+        'open_time',
+        'close_time',
+        'map_url',
     ];
 
     protected function casts(): array
