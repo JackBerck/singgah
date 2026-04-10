@@ -7,6 +7,7 @@ import {
     Mail,
     Map,
     MessageCircle,
+    Phone,
     Shield,
     Target,
     Trees,
@@ -121,11 +122,11 @@ const contacts = [
         color: 'var(--singgah-teal-500)',
     },
     {
-        icon: Youtube,
-        label: 'YouTube',
-        value: 'Singgah Indonesia',
-        href: 'https://youtube.com/@singgah.id',
-        color: '#dc2626',
+        icon: Phone,
+        label: 'Telepon',
+        value: '+62 812 3456 7890',
+        href: 'tel:+6281234567890',
+        color: 'var(--singgah-green-600)',
     },
 ];
 
