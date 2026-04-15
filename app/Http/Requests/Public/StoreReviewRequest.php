@@ -14,7 +14,7 @@ class StoreReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reviewable_type' => ['required', 'string', 'in:village,attraction,culinary,accommodation'],
+            'reviewable_type' => ['required', 'string', 'in:village,attraction,culinary,accommodation,event,village_event'],
             'reviewable_id'   => ['required', 'integer', 'min:1'],
             'rating'          => ['required', 'integer', 'min:1', 'max:5'],
             'comment'         => ['nullable', 'string', 'max:1000'],

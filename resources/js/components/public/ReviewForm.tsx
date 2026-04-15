@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { MessageSquare, Loader2 } from 'lucide-react';
 import StarRating from './StarRating';
-import { Link } from '@inertiajs/react';
+import ReviewItem from './ReviewItem';
+import { Link, usePage } from '@inertiajs/react';
 
 interface ReviewFormProps {
-    reviewableType: 'village' | 'attraction' | 'culinary' | 'accommodation';
+    reviewableType: 'village' | 'attraction' | 'culinary' | 'accommodation' | 'village_event';
     reviewableId: number;
     isLoggedIn: boolean;
     existingReview?: {
@@ -24,6 +25,7 @@ export default function ReviewForm({
     existingReview,
     onSuccess,
 }: ReviewFormProps) {
+    const { auth } = usePage<{ auth: { user: { id: number; name: string; avatar: string | null } | null } }>().props;
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
@@ -44,35 +46,26 @@ export default function ReviewForm({
 
     if (existingReview) {
         return (
-            <div
-                className="rounded-2xl p-5"
-                style={{
-                    background: 'var(--singgah-green-50)',
-                    border: '1.5px solid var(--singgah-green-100)',
-                }}
-            >
+            <div className="mb-6">
                 <p
                     className="mb-2 text-sm font-semibold"
                     style={{ color: 'var(--singgah-green-700)' }}
                 >
                     ✓ Ulasan Anda
                 </p>
-                <StarRating value={existingReview.rating} size="sm" />
-                {existingReview.comment && (
-                    <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                        {existingReview.comment}
-                    </p>
-                )}
-                <button
-                    className="mt-3 text-xs text-red-500 transition-colors hover:text-red-700"
-                    onClick={() => {
-                        router.delete(`/reviews/${existingReview.id}`, {
-                            onSuccess: () => toast.success('Ulasan dihapus.'),
-                        });
-                    }}
-                >
-                    Hapus ulasan
-                </button>
+                <div style={{ border: '1px solid var(--singgah-green-200)', borderRadius: '1rem', overflow: 'hidden' }}>
+                    <ReviewItem
+                        review={{
+                            id: existingReview.id,
+                            user_id: auth.user?.id,
+                            rating: existingReview.rating,
+                            comment: existingReview.comment,
+                            user: auth.user,
+                            created_at: new Date().toISOString(),
+                        }}
+                        currentUserId={auth.user?.id}
+                    />
+                </div>
             </div>
         );
     }
@@ -129,7 +122,7 @@ export default function ReviewForm({
                     placeholder="Ceritakan pengalaman Anda..."
                     rows={3}
                     maxLength={1000}
-                    className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors outline-none focus:border-[var(--singgah-green-400)] focus:ring-2 focus:ring-[var(--singgah-green-100)]"
+                    className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors outline-none focus:border-(--singgah-green-400) focus:ring-2 focus:ring-(--singgah-green-100)"
                 />
                 <p className="mt-1 text-right text-xs text-gray-400">
                     {comment.length}/1000

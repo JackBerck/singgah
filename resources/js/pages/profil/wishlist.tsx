@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import ProfileLayout from '@/layouts/ProfileLayout';
+import SmartPagination from '@/components/ui/smart-pagination';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -42,9 +43,17 @@ interface AuthUser {
     avatar: string | null;
 }
 
+interface Paginator<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    links: { url: string | null; label: string; active: boolean }[];
+    total: number;
+}
+
 interface Props {
     user: AuthUser;
-    wishlists: WishlistItem[];
+    wishlists: Paginator<WishlistItem>;
     wishlists_count: number;
     reviews_count: number;
 }
@@ -138,11 +147,11 @@ export default function Wishlist({
                 <h2 className="mb-5 flex items-center justify-between font-semibold text-gray-800">
                     <span>Wishlist Saya</span>
                     <span className="text-sm font-normal text-gray-500">
-                        {wishlists.length} item
+                        {wishlists.total} item
                     </span>
                 </h2>
 
-                {wishlists.length === 0 ? (
+                {wishlists.data.length === 0 ? (
                     <div
                         className="rounded-2xl py-12 text-center"
                         style={{ background: 'var(--singgah-green-50)' }}
@@ -162,8 +171,9 @@ export default function Wishlist({
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                        {wishlists.map((item) => (
+                    <>
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                            {wishlists.data.map((item) => (
                             <div
                                 key={item.id}
                                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-lg"
@@ -265,7 +275,17 @@ export default function Wishlist({
                                 </div>
                             </div>
                         ))}
-                    </div>
+                        </div>
+                        {wishlists.last_page > 1 && (
+                            <div className="mt-8">
+                                <SmartPagination
+                                    links={wishlists.links}
+                                    currentPage={wishlists.current_page}
+                                    lastPage={wishlists.last_page}
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 

@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Star, Trash2 } from 'lucide-react';
 import StarRating from '@/components/public/StarRating';
 import ProfileLayout from '@/layouts/ProfileLayout';
+import SmartPagination from '@/components/ui/smart-pagination';
 
 interface Review {
     id: number;
@@ -25,9 +26,17 @@ interface AuthUser {
     avatar: string | null;
 }
 
+interface Paginator<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    links: { url: string | null; label: string; active: boolean }[];
+    total: number;
+}
+
 interface Props {
     user: AuthUser;
-    reviews: Review[];
+    reviews: Paginator<Review>;
     wishlists_count: number;
     reviews_count: number;
 }
@@ -51,6 +60,10 @@ export default function Ulasan({ user, reviews, wishlists_count, reviews_count }
         router.delete(`/reviews/${id}`, {
             preserveScroll: true,
             onSuccess: () => toast.success('Ulasan dihapus.'),
+            onError: (err) => {
+                const msg = Object.values(err)[0] as string;
+                toast.error(msg || 'Gagal menghapus ulasan.');
+            }
         });
     };
 
@@ -67,7 +80,7 @@ export default function Ulasan({ user, reviews, wishlists_count, reviews_count }
                 <h2 className="mb-5 font-semibold text-gray-800">
                     Ulasan Saya
                 </h2>
-                {reviews.length === 0 ? (
+                {reviews.data.length === 0 ? (
                     <div
                         className="rounded-2xl py-12 text-center"
                         style={{
@@ -91,8 +104,9 @@ export default function Ulasan({ user, reviews, wishlists_count, reviews_count }
                         </Link>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {reviews.map((r) => (
+                    <>
+                        <div className="space-y-4">
+                            {reviews.data.map((r) => (
                             <div
                                 key={r.id}
                                 className="review-item rounded-2xl border border-gray-100 p-4"
@@ -133,7 +147,17 @@ export default function Ulasan({ user, reviews, wishlists_count, reviews_count }
                                 )}
                             </div>
                         ))}
-                    </div>
+                        </div>
+                        {reviews.last_page > 1 && (
+                            <div className="mt-8">
+                                <SmartPagination
+                                    links={reviews.links}
+                                    currentPage={reviews.current_page}
+                                    lastPage={reviews.last_page}
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </ProfileLayout>

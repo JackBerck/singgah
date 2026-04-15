@@ -85,10 +85,8 @@ class WishlistController extends Controller
                 },
             ])
             ->latest()
-            ->get();
-
-        // Map to a clean array for the frontend
-        $items = $wishlists->map(function (Wishlist $wl) {
+            ->paginate(12)
+            ->through(function (Wishlist $wl) {
             $entity    = $wl->wishlistable;
             $shortType = array_search($wl->wishlistable_type, self::TYPE_MAP);
 
@@ -105,10 +103,10 @@ class WishlistController extends Controller
             // Resolve url
             $url = match ($shortType) {
                 'village'       => "/desa/{$entity->slug}",
-                'event'         => "/desa/{$entity->village->slug}/events/{$entity->id}",
-                'attraction'    => "/desa/{$entity->village->slug}/attractions/{$entity->id}",
-                'culinary'      => "/desa/{$entity->village->slug}/culinaries/{$entity->id}",
-                'accommodation' => "/desa/{$entity->village->slug}/accommodations/{$entity->id}",
+                'event'         => "/desa/{$entity->village->slug}/events/{$entity->slug}",
+                'attraction'    => "/desa/{$entity->village->slug}/attractions/{$entity->slug}",
+                'culinary'      => "/desa/{$entity->village->slug}/culinaries/{$entity->slug}",
+                'accommodation' => "/desa/{$entity->village->slug}/accommodations/{$entity->slug}",
                 default         => '#',
             };
 
@@ -127,11 +125,11 @@ class WishlistController extends Controller
                 'description' => $description,
                 'created_at'  => $wl->created_at,
             ];
-        })->filter()->values();
+        });
 
         return Inertia::render('profil/wishlist', [
             'user'            => $user->only('id', 'name', 'email', 'role', 'avatar'),
-            'wishlists'       => $items,
+            'wishlists'       => $wishlists,
             'wishlists_count' => $user->wishlists()->count(),
             'reviews_count'   => $user->reviews()->count(),
         ]);

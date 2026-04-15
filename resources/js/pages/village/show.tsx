@@ -16,6 +16,7 @@ import StarRating from '@/components/public/StarRating';
 import BookmarkButton from '@/components/public/BookmarkButton';
 import ShareButton from '@/components/public/ShareButton';
 import PublicLayout from '@/layouts/PublicLayout';
+import SmartPagination from '@/components/ui/smart-pagination';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -34,6 +35,7 @@ interface Review {
 }
 interface VillageEvent {
     id: number;
+    slug: string;
     name: string;
     event_date: string;
     location: string | null;
@@ -42,6 +44,7 @@ interface VillageEvent {
 }
 interface ContentItem {
     id: number;
+    slug: string;
     name: string;
     location: string | null;
     price_min: number | null;
@@ -65,18 +68,26 @@ interface Village {
     map_url: string | null;
     media: MediaItem[];
     manager: { id: number; name: string; phone: string | null } | null;
-    events: VillageEvent[];
-    attractions: ContentItem[];
-    culinaries: ContentItem[];
-    accommodations: ContentItem[];
     reviews: Review[];
     reviews_count: number;
     reviews_avg_rating: number;
     created_at: string;
 }
 
+interface Paginator<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    links: { url: string | null; label: string; active: boolean }[];
+    total: number;
+}
+
 interface Props {
     village: Village;
+    events: Paginator<VillageEvent>;
+    attractions: Paginator<ContentItem>;
+    culinaries: Paginator<ContentItem>;
+    accommodations: Paginator<ContentItem>;
     userReview: { id: number; rating: number; comment: string | null } | null;
     ratingBreakdown: Record<string, number>;
     isWishlisted: boolean;
@@ -215,6 +226,10 @@ function ContentCard({
 
 export default function VillageShow({
     village,
+    events,
+    attractions,
+    culinaries,
+    accommodations,
     userReview,
     ratingBreakdown,
     isWishlisted,
@@ -229,11 +244,11 @@ export default function VillageShow({
     const avgRating = Number(village.reviews_avg_rating) || 0;
 
     const now = new Date();
-    const upcomingEvents = village.events.filter(
+    const upcomingEvents = events.data.filter(
         (e) => new Date(e.event_date) >= now,
     );
     const displayedEvents =
-        eventFilter === 'upcoming' ? upcomingEvents : village.events;
+        eventFilter === 'upcoming' ? upcomingEvents : events.data;
 
     return (
         <PublicLayout>
@@ -611,7 +626,7 @@ export default function VillageShow({
                                                     .map((ev) => (
                                                         <Link
                                                             key={ev.id}
-                                                            href={`/desa/${village.slug}/events/${ev.id}`}
+                                                            href={`/desa/${village.slug}/events/${ev.slug}`}
                                                             className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md"
                                                         >
                                                             <div
@@ -656,7 +671,7 @@ export default function VillageShow({
                                     )}
 
                                     {/* Highlight wisata */}
-                                    {village.attractions.length > 0 && (
+                                    {attractions.data.length > 0 && (
                                         <div>
                                             <div className="mb-3 flex items-center justify-between">
                                                 <h2 className="font-semibold text-gray-800">
@@ -675,13 +690,13 @@ export default function VillageShow({
                                                 </button>
                                             </div>
                                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                                {village.attractions
+                                                {attractions.data
                                                     .slice(0, 3)
                                                     .map((a) => (
                                                         <ContentCard
                                                             key={a.id}
                                                             item={a}
-                                                            href={`/desa/${village.slug}/attractions/${a.id}`}
+                                                            href={`/desa/${village.slug}/attractions/${a.slug}`}
                                                             type="attraction"
                                                         />
                                                     ))}
@@ -741,7 +756,7 @@ export default function VillageShow({
                                                 return (
                                                     <Link
                                                         key={ev.id}
-                                                        href={`/desa/${village.slug}/events/${ev.id}`}
+                                                        href={`/desa/${village.slug}/events/${ev.slug}`}
                                                         className="flex items-start gap-4 rounded-2xl border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md"
                                                     >
                                                         {evSrc && (
@@ -789,18 +804,28 @@ export default function VillageShow({
                                     <h2 className="mb-5 font-semibold text-gray-800">
                                         Wisata & Atraksi
                                     </h2>
-                                    {village.attractions.length === 0 ? (
+                                    {attractions.data.length === 0 ? (
                                         <SectionEmpty message="Belum ada wisata yang terdaftar." />
                                     ) : (
                                         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                                            {village.attractions.map((a) => (
+                                            {attractions.data.map((a) => (
                                                 <ContentCard
                                                     key={a.id}
                                                     item={a}
-                                                    href={`/desa/${village.slug}/attractions/${a.id}`}
+                                                    href={`/desa/${village.slug}/attractions/${a.slug}`}
                                                     type="attraction"
                                                 />
                                             ))}
+                                        </div>
+                                    )}
+
+                                    {attractions.last_page > 1 && (
+                                        <div className="mt-8">
+                                            <SmartPagination
+                                                links={attractions.links}
+                                                currentPage={attractions.current_page}
+                                                lastPage={attractions.last_page}
+                                            />
                                         </div>
                                     )}
                                 </div>
@@ -812,18 +837,28 @@ export default function VillageShow({
                                     <h2 className="mb-5 font-semibold text-gray-800">
                                         Kuliner & UMKM
                                     </h2>
-                                    {village.culinaries.length === 0 ? (
+                                    {culinaries.data.length === 0 ? (
                                         <SectionEmpty message="Belum ada kuliner yang terdaftar." />
                                     ) : (
                                         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                                            {village.culinaries.map((c) => (
+                                            {culinaries.data.map((c) => (
                                                 <ContentCard
                                                     key={c.id}
                                                     item={c}
-                                                    href={`/desa/${village.slug}/culinaries/${c.id}`}
+                                                    href={`/desa/${village.slug}/culinaries/${c.slug}`}
                                                     type="culinary"
                                                 />
                                             ))}
+                                        </div>
+                                    )}
+
+                                    {culinaries.last_page > 1 && (
+                                        <div className="mt-8">
+                                            <SmartPagination
+                                                links={culinaries.links}
+                                                currentPage={culinaries.current_page}
+                                                lastPage={culinaries.last_page}
+                                            />
                                         </div>
                                     )}
                                 </div>
@@ -835,18 +870,28 @@ export default function VillageShow({
                                     <h2 className="mb-5 font-semibold text-gray-800">
                                         Akomodasi
                                     </h2>
-                                    {village.accommodations.length === 0 ? (
+                                    {accommodations.data.length === 0 ? (
                                         <SectionEmpty message="Belum ada akomodasi yang terdaftar." />
                                     ) : (
                                         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                                            {village.accommodations.map((a) => (
+                                            {accommodations.data.map((a) => (
                                                 <ContentCard
                                                     key={a.id}
                                                     item={a}
-                                                    href={`/desa/${village.slug}/accommodations/${a.id}`}
+                                                    href={`/desa/${village.slug}/accommodations/${a.slug}`}
                                                     type="accommodation"
                                                 />
                                             ))}
+                                        </div>
+                                    )}
+
+                                    {accommodations.last_page > 1 && (
+                                        <div className="mt-8">
+                                            <SmartPagination
+                                                links={accommodations.links}
+                                                currentPage={accommodations.current_page}
+                                                lastPage={accommodations.last_page}
+                                            />
                                         </div>
                                     )}
                                 </div>

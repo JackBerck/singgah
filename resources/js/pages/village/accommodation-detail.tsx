@@ -12,6 +12,8 @@ import PublicLayout from '@/layouts/PublicLayout';
 import MediaGallery from '@/components/public/MediaGallery';
 import StarRating from '@/components/public/StarRating';
 import ReviewForm from '@/components/public/ReviewForm';
+import ReviewItem from '@/components/public/ReviewItem';
+import SmartPagination from '@/components/ui/smart-pagination';
 import BookmarkButton from '@/components/public/BookmarkButton';
 import ShareButton from '@/components/public/ShareButton';
 
@@ -25,8 +27,16 @@ interface Review {
     id: number;
     rating: number;
     comment: string | null;
-    user: { name: string } | null;
+    user: { id: number; name: string; avatar: string | null } | null;
     created_at: string;
+}
+
+interface Paginator<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    links: { url: string | null; label: string; active: boolean }[];
+    total: number;
 }
 
 interface Accommodation {
@@ -41,7 +51,6 @@ interface Accommodation {
     close_time: string | null;
     map_url: string | null;
     media: MediaItem[];
-    reviews: Review[];
     reviews_count: number;
     reviews_avg_rating: number;
 }
@@ -49,6 +58,7 @@ interface Accommodation {
 interface Props {
     village: { id: number; name: string; slug: string };
     accommodation: Accommodation;
+    reviews: Paginator<Review>;
     userReview: { id: number; rating: number; comment: string | null } | null;
     isWishlisted?: boolean;
 }
@@ -65,6 +75,7 @@ const fmtDate = (d: string) =>
 export default function AccommodationDetail({
     village,
     accommodation,
+    reviews,
     userReview,
     isWishlisted = false,
 }: Props) {
@@ -78,7 +89,7 @@ export default function AccommodationDetail({
 
             {/* Breadcrumb */}
             <div className="section-padding-x border-b border-gray-100 bg-white pt-20 pb-3">
-                <div className="container max-w-4xl">
+                <div className="container max-w-7xl">
                     <nav className="flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
                         <Link href="/" className="hover:text-gray-700">
                             Beranda
@@ -103,7 +114,7 @@ export default function AccommodationDetail({
             </div>
 
             <section className="section-padding-x py-10">
-                <div className="container max-w-4xl">
+                <div className="container max-w-7xl">
                     <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
                         {/* Left */}
                         <div className="space-y-8">
@@ -195,47 +206,20 @@ export default function AccommodationDetail({
                                     isLoggedIn={isLoggedIn}
                                     existingReview={userReview}
                                 />
-                                {accommodation.reviews.length > 0 && (
+                                {reviews.data.length > 0 && (
                                     <div className="mt-5 space-y-3">
-                                        {accommodation.reviews.map((r) => (
-                                            <div
-                                                key={r.id}
-                                                className="review-item rounded-2xl border border-gray-100 bg-white p-4"
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-2">
-                                                        <div
-                                                            className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-white"
-                                                            style={{
-                                                                background:
-                                                                    'var(--singgah-green-600)',
-                                                            }}
-                                                        >
-                                                            {r.user?.name?.[0]?.toUpperCase() ??
-                                                                '?'}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-semibold text-gray-800">
-                                                                {r.user?.name ??
-                                                                    'Anonim'}
-                                                            </p>
-                                                            <StarRating
-                                                                value={r.rating}
-                                                                size="sm"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-xs text-gray-400">
-                                                        {fmtDate(r.created_at)}
-                                                    </span>
-                                                </div>
-                                                {r.comment && (
-                                                    <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                                                        {r.comment}
-                                                    </p>
-                                                )}
-                                            </div>
+                                        {reviews.data.map((r) => (
+                                            <ReviewItem key={r.id} review={r} currentUserId={auth?.user?.id} />
                                         ))}
+                                    </div>
+                                )}
+                                {reviews.last_page > 1 && (
+                                    <div className="mt-8">
+                                        <SmartPagination
+                                            links={reviews.links}
+                                            currentPage={reviews.current_page}
+                                            lastPage={reviews.last_page}
+                                        />
                                     </div>
                                 )}
                             </div>

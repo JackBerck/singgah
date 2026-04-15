@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Str;
 
 class Attraction extends Model
 {
@@ -32,6 +33,15 @@ class Attraction extends Model
             'price_min' => 'float',
             'price_max' => 'float',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function ($model) {
+            if (empty($model->slug)) {
+                $model->slug = Str::slug($model->name);
+            }
+        });
     }
 
     // ─── Relationships ────────────────────────────────────────────────────────────

@@ -33,10 +33,10 @@ Route::get('/syarat', [StaticPageController::class, 'terms'])->name('terms');
 // Explore & Village Profile
 Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
 Route::get('/desa/{slug}', [VillageProfileController::class, 'show'])->name('village.show');
-Route::get('/desa/{slug}/events/{id}', [VillageProfileController::class, 'showEvent'])->name('village.event');
-Route::get('/desa/{slug}/attractions/{id}', [VillageProfileController::class, 'showAttraction'])->name('village.attraction');
-Route::get('/desa/{slug}/culinaries/{id}', [VillageProfileController::class, 'showCulinary'])->name('village.culinary');
-Route::get('/desa/{slug}/accommodations/{id}', [VillageProfileController::class, 'showAccommodation'])->name('village.accommodation');
+Route::get('/desa/{slug}/events/{itemSlug}', [VillageProfileController::class, 'showEvent'])->name('village.event');
+Route::get('/desa/{slug}/attractions/{itemSlug}', [VillageProfileController::class, 'showAttraction'])->name('village.attraction');
+Route::get('/desa/{slug}/culinaries/{itemSlug}', [VillageProfileController::class, 'showCulinary'])->name('village.culinary');
+Route::get('/desa/{slug}/accommodations/{itemSlug}', [VillageProfileController::class, 'showAccommodation'])->name('village.accommodation');
 
 // Manager Registration
 Route::get('/register/pengelola', [RegisteredManagerController::class, 'create'])->name('register.manager');
@@ -52,7 +52,8 @@ Route::post('/ai/chat', [AiChatController::class, 'chat'])
 Route::middleware(['auth'])->group(function () {
     // Reviews
     Route::post('/reviews', [PublicReviewController::class, 'store'])->name('reviews.store');
-    Route::delete('/reviews/{id}', [PublicReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::put('/reviews/{review}', [PublicReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [PublicReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Wishlist toggle (AJAX)
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');

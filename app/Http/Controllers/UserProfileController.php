@@ -42,13 +42,17 @@ class UserProfileController extends Controller
     public function ulasan(): Response
     {
         /** @var \App\Models\User $user */
-        $user = auth()->user()->load([
-            'reviews' => fn($q) => $q->with(['reviewable'])->visible()->latest()->limit(50),
-        ]);
+        $user = auth()->user();
+
+        $reviews = $user->reviews()
+            ->with(['reviewable'])
+            ->visible()
+            ->latest()
+            ->paginate(5);
 
         return Inertia::render('profil/ulasan', [
             'user'           => $user->only('id', 'name', 'email', 'role', 'avatar'),
-            'reviews'        => $user->reviews,
+            'reviews'        => $reviews,
             'wishlists_count' => $user->wishlists()->count(),
             'reviews_count'  => $user->reviews()->count(),
         ]);
