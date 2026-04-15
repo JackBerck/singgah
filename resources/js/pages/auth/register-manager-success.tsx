@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { CheckCircle } from 'lucide-react';
 import AuthLayout from '@/layouts/auth-layout';
+import { Button } from '@/components/ui/button';
 
 export default function RegisterManagerSuccess() {
     return (
@@ -64,7 +65,7 @@ export default function RegisterManagerSuccess() {
                             }}
                         >
                             <div
-                                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                                 style={{
                                     background: done
                                         ? 'var(--singgah-green-600)'
@@ -83,12 +84,13 @@ export default function RegisterManagerSuccess() {
                 </div>
 
                 <div className="flex w-full flex-col gap-2">
-                    <Link
-                        href="/manager"
-                        className="btn-primary w-full justify-center rounded-full py-3 text-base"
+                    <Button
+                        asChild
+                        className="w-full rounded-full font-semibold text-white"
+                        style={{ background: 'var(--singgah-green-600)' }}
                     >
-                        Ke Dashboard Pengelola
-                    </Link>
+                        <Link href="/manager">Ke Dashboard Pengelola</Link>
+                    </Button>
                     <Link
                         href="/"
                         className="text-sm text-gray-500 hover:underline"

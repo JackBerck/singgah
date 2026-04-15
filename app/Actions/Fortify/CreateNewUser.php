@@ -19,15 +19,28 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
+        $normalizedInput = [
+            ...$input,
+            'name' => trim((string) ($input['name'] ?? '')),
+            'email' => strtolower(trim((string) ($input['email'] ?? ''))),
+        ];
+
+        Validator::make($normalizedInput, [
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
+        ], [
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email ini sudah terdaftar.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ])->validate();
 
         return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => $input['password'],
+            'name' => $normalizedInput['name'],
+            'email' => $normalizedInput['email'],
+            'password' => $normalizedInput['password'],
         ]);
     }
 }

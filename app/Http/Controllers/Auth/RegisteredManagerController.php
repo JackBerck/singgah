@@ -47,11 +47,16 @@ class RegisteredManagerController extends Controller
             $count++;
         }
 
+        $shortDescription = $data['village_short_description'] ?? null;
+        $description = $shortDescription
+            ?? "Profil desa {$villageName} sedang dalam proses verifikasi oleh tim admin Singgah.";
+
         Village::create([
             'manager_id'        => $user->id,
             'name'              => $villageName,
             'slug'              => $slug,
-            'short_description' => $data['village_short_description'] ?? null,
+            'short_description' => $shortDescription,
+            'description'       => $description,
             'address'           => $data['village_address'] ?? null,
             'status'            => 'pending',
         ]);
