@@ -666,7 +666,7 @@ Digunakan untuk entitas yang dapat berelasi dengan multiple models:
 1. Ekstraksi keyword dari query user (hapus stopwords Indonesia)
 2. Pencarian data relevan dari database (villages, attractions, culinaries, accommodations, events)
 3. Build context dari hasil pencarian
-4. Kirim context + query ke AI API (OpenRouter)
+4. Kirim context + query ke AI API (SumoPod)
 5. Return response AI ke user
 
 ### 4.2 Fitur Autentikasi
