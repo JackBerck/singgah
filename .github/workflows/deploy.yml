@@ -2,7 +2,7 @@ name: Build & Deploy (ARM64)
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
 
 env:
   REGISTRY: ghcr.io
@@ -60,23 +60,21 @@ jobs:
       - name: Deploy ke STB
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.STB_HOST }}
-          username: ${{ secrets.STB_USER }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: IMAGE_NAME
           script: |
             set -e
-            mkdir -p /opt/apps/singgah
+            # Gunakan sudo untuk membuat folder jika belum ada, lalu beri izin ke user armbian
+            sudo mkdir -p /opt/apps/singgah
+            sudo chown -R $USER:$USER /opt/apps/singgah
             cd /opt/apps/singgah
 
             # Update .env dari secrets
             echo "${{ secrets.ENV_FILE }}" > .env
 
-            # Tambahkan variabel dinamis ke .env
-            echo "DOCKER_IMAGE=$IMAGE_NAME" >> .env
-            echo "SUMOPOD_API_KEY=${{ secrets.SUMOPOD_API_KEY }}" >> .env
-
-            # Buat docker-compose.yaml dengan port 8003
+            # Buat docker-compose.yaml (Memperbaiki error '*' yang harus di-quote)
             cat << 'EOF' > docker-compose.yaml
             services:
               app:
@@ -87,7 +85,7 @@ jobs:
                   - "8003:80"
                 env_file: .env
                 environment:
-                  - TRUSTED_PROXIES=*
+                  - TRUSTED_PROXIES="*"
                   - SUMOPOD_API_KEY=${SUMOPOD_API_KEY}
                   - APP_PORT=8003
                 volumes:
@@ -113,10 +111,10 @@ jobs:
             # Restart container
             docker compose up -d --remove-orphans
 
-            # Jalankan migrasi di dalam container yang sedang berjalan
+            # Jalankan migrasi
             docker exec singgah-app php artisan migrate --force
 
-            # Pembersihan image lama
+            # Bersihkan image lama
             docker image prune -f
 
             echo "✅ Deploy selesai ke port 8003: $(date)"
