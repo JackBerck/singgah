@@ -1,5 +1,5 @@
-# Stage 1: Build Assets & PHP Dependencies
-FROM php:8.4-alpine AS builder
+# Stage 1: Build Assets (Dijalankan secara NATIVE di arsitektur host untuk kecepatan & stabilitas)
+FROM --platform=$BUILDPLATFORM php:8.4-alpine AS builder
 WORKDIR /app
 
 # Install Node.js & NPM
@@ -8,7 +8,7 @@ RUN apk add --no-cache nodejs npm
 # Install PHP Extension Installer
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# Install ekstensi yang dibutuhkan untuk build & artisan
+# Install ekstensi minimal agar artisan bisa jalan di stage build
 RUN install-php-extensions pdo_mysql pdo_pgsql gd bcmath zip
 
 # Ambil composer
@@ -20,23 +20,23 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Generate Key & Build Frontend
+# Generate Key & Build Frontend (Native x86_64 - Jauh lebih cepat & tidak akan Illegal Instruction)
 RUN cp .env.example .env && \
     php artisan key:generate && \
     npm install && \
     npm run build
 
 
-# Stage 2: Production Image (Final)
+# Stage 2: Production Image (Final - Arsitektur ARM64 untuk STB)
 FROM php:8.4-fpm-alpine
 
 # Install PHP Extension Installer lagi untuk stage ini
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# Install runtime dependencies (Nginx, Supervisor, dll)
+# Install runtime dependencies
 RUN apk add --no-cache nginx supervisor
 
-# Install ekstensi PHP untuk runtime (Sama seperti builder)
+# Install ekstensi PHP untuk runtime (ARM64)
 RUN install-php-extensions pdo_mysql pdo_pgsql opcache gd bcmath zip
 
 # Optimasi OPcache untuk STB (RAM Kecil)
@@ -47,7 +47,7 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 
 WORKDIR /var/www/html
 
-# Salin hasil dari stage builder (termasuk vendor dan public/build)
+# Salin hasil dari stage builder (Hasil build frontend .js/.css bisa dipakai di arsitektur mana saja)
 COPY --from=builder /app .
 
 # Konfigurasi Nginx & Supervisor
