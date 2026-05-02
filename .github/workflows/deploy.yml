@@ -66,9 +66,8 @@ jobs:
           envs: IMAGE_NAME
           script: |
             set -e
-            # Gunakan sudo untuk membuat folder jika belum ada, lalu beri izin ke user armbian
-            sudo mkdir -p /opt/apps/singgah
-            sudo chown -R $USER:$USER /opt/apps/singgah
+            # Setup folder (Pastikan izin sudah diberikan manual di STB sekali saja)
+            mkdir -p /opt/apps/singgah
             cd /opt/apps/singgah
 
             # Update .env dari secrets
