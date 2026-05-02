@@ -2,55 +2,62 @@
 FROM php:8.4-alpine AS builder
 WORKDIR /app
 
-# Install Node.js, NPM, dan alat build sistem
-RUN apk add --no-cache nodejs npm icu-dev libpng-dev libjpeg-turbo-dev freetype-dev postgresql-dev libpq zlib-dev libzip-dev
+# Install Node.js & NPM
+RUN apk add --no-cache nodejs npm
 
-# Install ekstensi PHP yang dibutuhkan Laravel agar bisa 'booting' (untuk Wayfinder)
-RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql gd bcmath zip
+# Install PHP Extension Installer
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# Ambil composer dari image resmi
+# Install ekstensi yang dibutuhkan untuk build & artisan
+RUN install-php-extensions pdo_mysql pdo_pgsql gd bcmath zip
+
+# Ambil composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Salin semua file proyek
+# Salin semua file
 COPY . .
 
-# 1. Install PHP dependencies
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# 2. Siapkan .env dan Generate Key (Agar Laravel bisa booting tanpa error)
-RUN cp .env.example .env && php artisan key:generate
+# Generate Key & Build Frontend
+RUN cp .env.example .env && \
+    php artisan key:generate && \
+    npm install && \
+    npm run build
 
-# 3. Build Frontend (Inertia/React)
-RUN npm install && npm run build
 
-
-# Stage 2: Production Image (Minimal & Cepat)
+# Stage 2: Production Image (Final)
 FROM php:8.4-fpm-alpine
 
-# Install runtime dependencies saja (lebih ringan)
-RUN apk add --no-cache nginx supervisor libpng libjpeg-turbo freetype postgresql-libs libpq libzip
+# Install PHP Extension Installer lagi untuk stage ini
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# Install ekstensi PHP yang sama untuk runtime
-RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql opcache gd bcmath zip
+# Install runtime dependencies (Nginx, Supervisor, dll)
+RUN apk add --no-cache nginx supervisor
+
+# Install ekstensi PHP untuk runtime (Sama seperti builder)
+RUN install-php-extensions pdo_mysql pdo_pgsql opcache gd bcmath zip
 
 # Optimasi OPcache untuk STB (RAM Kecil)
 RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.memory_consumption=32" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.max_accelerated_files=4000" >> /usr/local/etc/php/conf.d/opcache.ini
+    && echo "opcache.max_accelerated_files=4000" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini
 
 WORKDIR /var/www/html
 
-# Salin folder vendor dan public/build dari stage builder
+# Salin hasil dari stage builder (termasuk vendor dan public/build)
 COPY --from=builder /app .
 
-# Set permissions
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod +x docker/start-container.sh
-
+# Konfigurasi Nginx & Supervisor
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-RUN mkdir -p /var/log/supervisor
+# Set permissions & setup log
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod +x docker/start-container.sh \
+    && mkdir -p /var/log/supervisor
 
 EXPOSE 80
 
