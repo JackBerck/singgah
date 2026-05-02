@@ -1,13 +1,21 @@
 # Stage 1: Build Frontend Assets
-FROM node:22-alpine AS frontend-builder
+FROM php:8.4-alpine AS frontend-builder
 WORKDIR /app
+
+# Install Node.js dan NPM untuk build React
+RUN apk add --no-cache nodejs npm
+
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+# Wayfinder butuh .env (setidaknya APP_KEY) untuk artisan command
+RUN cp .env.example .env && php artisan key:generate
+
 RUN npm run build
 
 # Stage 2: Production Image
-FROM --platform=linux/arm64 php:8.4-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
     nginx \
