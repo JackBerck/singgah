@@ -1,3 +1,12 @@
+# Stage 1: Build Frontend Assets
+FROM node:22-alpine AS frontend-builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Stage 2: Production Image
 FROM --platform=linux/arm64 php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
@@ -23,6 +32,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
+# Salin aset yang sudah di-build dari Stage 1
+COPY --from=frontend-builder /app/public/build ./public/build
+
 # Install dependencies & set permissions
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
     && chown -R www-data:www-data storage bootstrap/cache \
@@ -31,7 +43,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction \
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-# Log directory for supervisor
 RUN mkdir -p /var/log/supervisor
 
 EXPOSE 80

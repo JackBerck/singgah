@@ -109,6 +109,9 @@ jobs:
               storage:
             EOF
 
+            # Pastikan network eksternal tersedia
+            docker network create app-network || true
+
             # Pull image baru dengan variabel yang sudah di-export
             docker compose pull
 
