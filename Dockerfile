@@ -1,51 +1,50 @@
-# Stage 1: Build Frontend Assets
-FROM php:8.4-alpine AS frontend-builder
+# Stage 1: Build Assets & PHP Dependencies
+FROM php:8.4-alpine AS builder
 WORKDIR /app
 
-# Install Node.js dan NPM untuk build React
-RUN apk add --no-cache nodejs npm
+# Install Node.js, NPM, dan alat build sistem
+RUN apk add --no-cache nodejs npm icu-dev libpng-dev libjpeg-turbo-dev freetype-dev postgresql-dev libpq zlib-dev libzip-dev
 
-COPY package*.json ./
-RUN npm install
-COPY . .
+# Install ekstensi PHP yang dibutuhkan Laravel agar bisa 'booting' (untuk Wayfinder)
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql gd bcmath zip
 
-# Wayfinder butuh .env (setidaknya APP_KEY) untuk artisan command
-RUN cp .env.example .env && php artisan key:generate
-
-RUN npm run build
-
-# Stage 2: Production Image
-FROM php:8.4-fpm-alpine
-
-RUN apk add --no-cache \
-    nginx \
-    supervisor \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    postgresql-dev \
-    libpq \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql opcache gd bcmath \
-    && apk del --no-cache libpng-dev libjpeg-turbo-dev freetype-dev postgresql-dev
-
-# OPcache tuning untuk RAM kecil (STB)
-RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.memory_consumption=32" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.max_accelerated_files=4000" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini
-
+# Ambil composer dari image resmi
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+# Salin semua file proyek
 COPY . .
 
-# Salin aset yang sudah di-build dari Stage 1
-COPY --from=frontend-builder /app/public/build ./public/build
+# 1. Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install dependencies & set permissions
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
-    && chown -R www-data:www-data storage bootstrap/cache \
+# 2. Siapkan .env dan Generate Key (Agar Laravel bisa booting tanpa error)
+RUN cp .env.example .env && php artisan key:generate
+
+# 3. Build Frontend (Inertia/React)
+RUN npm install && npm run build
+
+
+# Stage 2: Production Image (Minimal & Cepat)
+FROM php:8.4-fpm-alpine
+
+# Install runtime dependencies saja (lebih ringan)
+RUN apk add --no-cache nginx supervisor libpng libjpeg-turbo freetype postgresql-libs libpq libzip
+
+# Install ekstensi PHP yang sama untuk runtime
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql opcache gd bcmath zip
+
+# Optimasi OPcache untuk STB (RAM Kecil)
+RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.memory_consumption=32" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.max_accelerated_files=4000" >> /usr/local/etc/php/conf.d/opcache.ini
+
+WORKDIR /var/www/html
+
+# Salin folder vendor dan public/build dari stage builder
+COPY --from=builder /app .
+
+# Set permissions
+RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod +x docker/start-container.sh
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
